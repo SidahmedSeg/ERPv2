@@ -171,7 +171,7 @@ export default function DashboardPage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Two-Factor Authentication</span>
-                <Badge variant={user?.two_factor_enabled ? "success" : "warning"}>
+                <Badge variant={user?.two_factor_enabled ? "success" : "secondary"}>
                   {user?.two_factor_enabled ? "Enabled" : "Not Enabled"}
                 </Badge>
               </div>
