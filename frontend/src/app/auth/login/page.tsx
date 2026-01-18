@@ -103,11 +103,11 @@ export default function LoginPage() {
                 remember_me: formData.remember,
             });
 
-            if (response.data.success) {
+            if (response.data.success && response.data.data) {
                 const responseData = response.data.data;
 
                 // Check if 2FA is required
-                if (responseData.requires_2fa) {
+                if (responseData.requires_2fa && responseData.two_factor_token) {
                     setRequires2FA(true);
                     setTempToken(responseData.two_factor_token);
                     setLoading(false);
