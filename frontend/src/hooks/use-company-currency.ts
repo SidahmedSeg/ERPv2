@@ -8,7 +8,7 @@ export function useCompanyCurrency() {
 
   useEffect(() => {
     const fetchCurrency = async () => {
-      if (!token) {
+      if (!accessToken) {
         setLoading(false);
         return;
       }

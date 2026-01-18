@@ -40,7 +40,7 @@ export function SecuritySection() {
     }, []);
 
     const loadStatus = async () => {
-        if (!token) return;
+        if (!accessToken) return;
         try {
             setLoading(true);
             const data = await twoFactorApi.getStatus(token);
@@ -54,7 +54,7 @@ export function SecuritySection() {
     };
 
     const handleSetupStart = async () => {
-        if (!token) return;
+        if (!accessToken) return;
         try {
             setProcessing(true);
             const data = await twoFactorApi.setup(token);
@@ -83,7 +83,7 @@ export function SecuritySection() {
                 secret: setupData.secret,
                 code: verificationCode,
                 backup_codes: setupData.backup_codes,
-            }, token);
+            }, accessToken);
             toast.success('Two-factor authentication enabled successfully');
             setSetupStep('backup');
         } catch (error: any) {
@@ -104,7 +104,7 @@ export function SecuritySection() {
     };
 
     const handleDisable = async () => {
-        if (!token) return;
+        if (!accessToken) return;
 
         if (!disablePassword) {
             toast.error('Please enter your password');
@@ -113,7 +113,7 @@ export function SecuritySection() {
 
         try {
             setProcessing(true);
-            await twoFactorApi.disable(disablePassword, token);
+            await twoFactorApi.disable(disablePassword, accessToken);
             toast.success('Two-factor authentication disabled');
             setIsDisableDialogOpen(false);
             setDisablePassword('');

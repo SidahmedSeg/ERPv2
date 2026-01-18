@@ -93,7 +93,7 @@ export function GeneralSettings() {
   const [faxCountryCode, setFaxCountryCode] = useState("+213");
 
   useEffect(() => {
-    if (token) {
+    if (accessToken) {
       fetchSettings();
     }
   }, [token]);

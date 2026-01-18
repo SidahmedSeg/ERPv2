@@ -124,7 +124,7 @@ export function GlobalSearch() {
     }, [query]);
 
     const performSearch = async (searchQuery: string) => {
-        if (!token) return;
+        if (!accessToken) return;
 
         setLoading(true);
         setShowResults(true);

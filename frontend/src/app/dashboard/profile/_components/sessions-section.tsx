@@ -31,10 +31,10 @@ export function SessionsSection() {
     }, []);
 
     const loadSessions = async () => {
-        if (!token) return;
+        if (!accessToken) return;
         try {
             setLoading(true);
-            const data = await sessionApi.getSessions(token);
+            const data = await sessionApi.getSessions(accessToken);
             setSessions(data);
         } catch (error: any) {
             console.error('Error loading sessions:', error);
@@ -46,10 +46,10 @@ export function SessionsSection() {
     };
 
     const handleRevokeSession = async (sessionId: string) => {
-        if (!token) return;
+        if (!accessToken) return;
         try {
             setProcessing(true);
-            await sessionApi.revokeSession(sessionId, token);
+            await sessionApi.revokeSession(sessionId, accessToken);
             toast.success('Session revoked successfully');
             setRevokeDialogOpen(false);
             setSessionToRevoke(null);
@@ -63,10 +63,10 @@ export function SessionsSection() {
     };
 
     const handleRevokeAllOtherSessions = async () => {
-        if (!token) return;
+        if (!accessToken) return;
         try {
             setProcessing(true);
-            await sessionApi.revokeAllOtherSessions(token);
+            await sessionApi.revokeAllOtherSessions(accessToken);
             toast.success('All other sessions revoked successfully');
             setRevokeAllDialogOpen(false);
             loadSessions();
