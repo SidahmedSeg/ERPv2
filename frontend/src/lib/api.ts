@@ -333,4 +333,5 @@ export const securityApi = {
     api.get<ApiResponse<{ logins: Session[] }>>(`/security/login-history?limit=${limit}`),
 };
 
+export { api };
 export default api;
