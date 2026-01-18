@@ -19,7 +19,7 @@ import { Key, Loader2, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function PasswordSection() {
-    const { token } = useAuthStore();
+    const { accessToken } = useAuthStore();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [processing, setProcessing] = useState(false);
     const [showCurrentPassword, setShowCurrentPassword] = useState(false);
@@ -66,7 +66,7 @@ export function PasswordSection() {
     };
 
     const handleSubmit = async () => {
-        if (!token || !validateForm()) return;
+        if (!accessToken || !validateForm()) return;
 
         try {
             setProcessing(true);
@@ -74,7 +74,7 @@ export function PasswordSection() {
                 current_password: formData.current_password,
                 new_password: formData.new_password,
                 confirm_password: formData.confirm_password,
-            }, token);
+            }, accessToken);
             toast.success('Password changed successfully');
             setIsDialogOpen(false);
             setFormData({
