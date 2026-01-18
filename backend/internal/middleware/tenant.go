@@ -47,8 +47,16 @@ func (m *TenantMiddleware) ResolveTenant(next http.Handler) http.Handler {
 			parts := strings.Split(host, ".")
 			if len(parts) >= 2 {
 				// If host is like "acme.myerp.local", tenant is "acme"
-				// If host is "myerp.local" or "localhost", no tenant
-				if parts[0] != "localhost" && parts[0] != "myerp" {
+				// Exclude system subdomains (single domain architecture)
+				systemSubdomains := []string{"localhost", "myerp", "app", "api", "www"}
+				isSystemSubdomain := false
+				for _, sys := range systemSubdomains {
+					if parts[0] == sys {
+						isSystemSubdomain = true
+						break
+					}
+				}
+				if !isSystemSubdomain {
 					tenantSlug = parts[0]
 				}
 			}
