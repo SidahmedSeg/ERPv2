@@ -1,0 +1,3 @@
+DROP FUNCTION IF EXISTS get_role_permissions(UUID, UUID);
+DROP FUNCTION IF EXISTS has_permission(UUID, UUID, VARCHAR, VARCHAR);
+DROP FUNCTION IF EXISTS get_user_permissions(UUID, UUID);
