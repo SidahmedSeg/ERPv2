@@ -200,16 +200,71 @@ func (s *AuthService) VerifyTenantEmail(ctx context.Context, token uuid.UUID) (*
 
 // Login authenticates a user and creates a session
 func (s *AuthService) Login(ctx context.Context, req *models.UserLoginRequest, deviceInfo utils.DeviceInfo, ipAddress string) (*models.UserLoginResponse, error) {
-	// For login, we need both tenant slug and user email
-	// In a real implementation, you'd extract tenant from subdomain or path
-	// For now, we'll find the user's tenant by email first
+	// Find all users with this email across all tenants
+	users, err := s.userRepo.FindAllByEmail(ctx, req.Email)
+	if err != nil || len(users) == 0 {
+		return nil, fmt.Errorf("invalid email or password")
+	}
 
-	// This is a simplified version - in production, you'd typically:
-	// 1. Extract tenant from subdomain (e.g., acme.myerp.com)
-	// 2. Or require tenant slug in login request
-	// For now, we'll return an error requiring tenant context
+	// If tenant_id is specified (second step of multi-tenant login)
+	if req.TenantID != "" {
+		tenantUUID, err := uuid.Parse(req.TenantID)
+		if err != nil {
+			return nil, fmt.Errorf("invalid tenant ID")
+		}
 
-	return nil, fmt.Errorf("tenant context required for login - this will be implemented with tenant resolution from subdomain/path")
+		// Find the specific user in that tenant
+		for _, user := range users {
+			if user.TenantID == tenantUUID {
+				// Verify password
+				if !utils.VerifyPassword(req.Password, user.PasswordHash) {
+					return nil, fmt.Errorf("invalid email or password")
+				}
+
+				// Check user status
+				if !user.CanLogin() {
+					return nil, fmt.Errorf("user account is not active")
+				}
+
+				// Authenticate this specific user
+				return s.LoginWithTenant(ctx, user.TenantID, req, deviceInfo, ipAddress)
+			}
+		}
+		return nil, fmt.Errorf("invalid tenant selection")
+	}
+
+	// First login attempt - verify password with first user found
+	// (all users with same email should have same password)
+	if !utils.VerifyPassword(req.Password, users[0].PasswordHash) {
+		return nil, fmt.Errorf("invalid email or password")
+	}
+
+	// Check how many tenants user belongs to
+	if len(users) > 1 {
+		// User belongs to multiple tenants - return tenant list for selection
+		tenants := make([]*models.Tenant, len(users))
+		for i, user := range users {
+			tenant, err := s.tenantRepo.FindByID(ctx, user.TenantID)
+			if err != nil {
+				continue // Skip this tenant if error
+			}
+			tenants[i] = tenant
+		}
+
+		return &models.UserLoginResponse{
+			Tenants: tenants, // Frontend will show tenant selector
+		}, nil
+	}
+
+	// Single tenant - authenticate directly
+	user := &users[0]
+
+	// Check user status
+	if !user.CanLogin() {
+		return nil, fmt.Errorf("user account is not active")
+	}
+
+	return s.LoginWithTenant(ctx, user.TenantID, req, deviceInfo, ipAddress)
 }
 
 // LoginWithTenant authenticates a user within a specific tenant
@@ -475,6 +530,7 @@ func (s *AuthService) createSessionAndTokens(
 
 	return &models.UserLoginResponse{
 		User:         user,
+		Tenant:       tenant,
 		AccessToken:  accessToken,
 		RefreshToken: refreshToken,
 		ExpiresIn:    expiresIn,

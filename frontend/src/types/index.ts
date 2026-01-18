@@ -138,22 +138,22 @@ export interface PaginationMeta {
 export interface LoginRequest {
   email: string;
   password: string;
-  tenant_slug: string;
+  tenant_id?: string; // Optional: For multi-tenant selection
   remember_me?: boolean;
 }
 
 export interface LoginResponse {
-  user: User;
-  tenant: Tenant;
-  access_token: string;
-  refresh_token: string;
-  requires_2fa: boolean;
+  user?: User;
+  tenant?: Tenant;
+  tenants?: Tenant[]; // For multi-tenant selection
+  access_token?: string;
+  refresh_token?: string;
+  requires_2fa?: boolean;
   two_factor_token?: string;
 }
 
 export interface RegisterRequest {
   company_name: string;
-  slug: string;
   email: string;
   password: string;
   first_name: string;

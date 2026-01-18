@@ -111,16 +111,19 @@ type UserLoginRequest struct {
 	Email      string `json:"email" validate:"required,email"`
 	Password   string `json:"password" validate:"required"`
 	RememberMe bool   `json:"remember_me,omitempty"`
+	TenantID   string `json:"tenant_id,omitempty"` // Optional: For multi-tenant selection
 }
 
 // UserLoginResponse represents a login response
 type UserLoginResponse struct {
-	User                *User  `json:"user"`
-	AccessToken         string `json:"access_token"`
-	RefreshToken        string `json:"refresh_token"`
-	ExpiresIn           int64  `json:"expires_in"` // Seconds until expiration
-	RequiresTwoFactor   bool   `json:"requires_two_factor"`
-	TwoFactorToken      string `json:"two_factor_token,omitempty"` // Temporary token for 2FA verification
+	User              *User      `json:"user,omitempty"`
+	Tenant            *Tenant    `json:"tenant,omitempty"`
+	Tenants           []*Tenant  `json:"tenants,omitempty"` // For multi-tenant selection
+	AccessToken       string     `json:"access_token,omitempty"`
+	RefreshToken      string     `json:"refresh_token,omitempty"`
+	ExpiresIn         int64      `json:"expires_in,omitempty"` // Seconds until expiration
+	RequiresTwoFactor bool       `json:"requires_two_factor,omitempty"`
+	TwoFactorToken    string     `json:"two_factor_token,omitempty"` // Temporary token for 2FA verification
 }
 
 // UserPasswordResetRequest represents a password reset request

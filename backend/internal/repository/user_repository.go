@@ -104,6 +104,38 @@ func (r *UserRepository) FindByEmail(ctx context.Context, tenantID uuid.UUID, em
 	return &user, nil
 }
 
+// FindAllByEmail finds all users with the given email across all tenants (bypasses RLS)
+// This is used for login when user can belong to multiple tenants
+func (r *UserRepository) FindAllByEmail(ctx context.Context, email string) ([]models.User, error) {
+	// Use WithBypassRLS to search across all tenants
+	tx, err := database.WithBypassRLS(ctx, r.db)
+	if err != nil {
+		return nil, err
+	}
+	defer tx.Rollback()
+
+	var users []models.User
+	query := `
+		SELECT u.* FROM users u
+		JOIN tenants t ON u.tenant_id = t.id
+		WHERE u.email = $1
+		AND u.status = 'active'
+		AND t.status = 'active'
+		ORDER BY u.created_at ASC
+	`
+
+	err = tx.SelectContext(ctx, &users, query, email)
+	if err != nil {
+		return nil, fmt.Errorf("failed to find users: %w", err)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return nil, fmt.Errorf("failed to commit transaction: %w", err)
+	}
+
+	return users, nil
+}
+
 // FindByResetToken retrieves a user by password reset token
 func (r *UserRepository) FindByResetToken(ctx context.Context, tenantID uuid.UUID, token uuid.UUID) (*models.User, error) {
 	tx, err := database.WithTenantContext(ctx, r.db, tenantID)

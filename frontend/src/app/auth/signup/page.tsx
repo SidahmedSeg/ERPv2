@@ -9,17 +9,14 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { authApi } from '@/lib/api';
-import { generateSlugPreview } from '@/lib/utils';
 
 export default function SignupPage() {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-    const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
 
     const [formData, setFormData] = useState({
         company_name: '',
-        slug: '',
         email: '',
         password: '',
         confirm_password: '',
@@ -29,26 +26,7 @@ export default function SignupPage() {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-
-        if (name === 'company_name') {
-            setFormData(prev => ({ ...prev, [name]: value }));
-
-            // Auto-generate slug only if user hasn't manually edited it
-            if (!slugManuallyEdited) {
-                const generatedSlug = generateSlugPreview(value);
-                setFormData(prev => ({ ...prev, slug: generatedSlug }));
-            }
-        } else if (name === 'slug') {
-            // User is manually editing the slug
-            setSlugManuallyEdited(true);
-            const cleanedSlug = value
-                .toLowerCase()
-                .replace(/[^a-z0-9-]/g, '')
-                .replace(/--+/g, '-');
-            setFormData(prev => ({ ...prev, [name]: cleanedSlug }));
-        } else {
-            setFormData(prev => ({ ...prev, [name]: value }));
-        }
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -56,16 +34,6 @@ export default function SignupPage() {
         setError('');
 
         // Validation
-        if (!formData.slug) {
-            setError('Subdomain is required');
-            return;
-        }
-
-        if (formData.slug.length < 3) {
-            setError('Subdomain must be at least 3 characters');
-            return;
-        }
-
         if (formData.password !== formData.confirm_password) {
             setError('Passwords do not match');
             return;
@@ -81,7 +49,6 @@ export default function SignupPage() {
         try {
             const response = await authApi.register({
                 company_name: formData.company_name,
-                slug: formData.slug,
                 email: formData.email,
                 password: formData.password,
                 first_name: formData.first_name,
@@ -104,7 +71,7 @@ export default function SignupPage() {
                 <CardHeader>
                     <CardTitle className="text-2xl">Create Your Account</CardTitle>
                     <CardDescription>
-                        Get started with MyERP in minutes. Your own subdomain and isolated workspace.
+                        Get started with MyERP in minutes. Secure, isolated workspace for your company.
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -126,29 +93,6 @@ export default function SignupPage() {
                                 onChange={handleChange}
                                 required
                             />
-                        </div>
-
-                        {/* Editable Slug Field */}
-                        <div className="space-y-2">
-                            <Label htmlFor="slug">Your Subdomain *</Label>
-                            <div className="flex items-center gap-0">
-                                <Input
-                                    id="slug"
-                                    name="slug"
-                                    placeholder="acme"
-                                    value={formData.slug}
-                                    onChange={handleChange}
-                                    required
-                                    minLength={3}
-                                    className="rounded-r-none border-r-0"
-                                />
-                                <div className="bg-gray-100 border border-gray-300 px-4 py-2 rounded-r-md text-sm text-gray-600 whitespace-nowrap">
-                                    .myerp.com
-                                </div>
-                            </div>
-                            <p className="text-xs text-gray-500">
-                                This will be your login URL. You can edit it if you want.
-                            </p>
                         </div>
 
                         {/* Name Fields */}
