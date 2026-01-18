@@ -16,7 +16,7 @@ export function useCompanyCurrency() {
       try {
         const response = await fetch('http://localhost:8080/api/settings/company', {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
@@ -32,7 +32,7 @@ export function useCompanyCurrency() {
     };
 
     fetchCurrency();
-  }, [token]);
+  }, [accessToken]);
 
   return { currency, loading };
 }

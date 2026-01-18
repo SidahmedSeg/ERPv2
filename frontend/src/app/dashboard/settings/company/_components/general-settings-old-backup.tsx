@@ -63,16 +63,16 @@ export function GeneralSettings() {
 
   // Fetch settings on mount
   useEffect(() => {
-    if (token) {
+    if (accessToken) {
       fetchSettings();
     }
-  }, [token]);
+  }, [accessToken]);
 
   const fetchSettings = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/settings/company", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -120,7 +120,7 @@ export function GeneralSettings() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(settings),
       });

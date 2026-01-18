@@ -16,7 +16,6 @@ import {
 } from '@/components/ui/breadcrumb';
 import { useBreadcrumbs } from '@/hooks/use-breadcrumbs';
 import Link from 'next/link';
-import { GlobalSearch } from '@/components/search/global-search';
 
 export function Header() {
     const breadcrumbs = useBreadcrumbs();
@@ -49,11 +48,8 @@ export function Header() {
                     </Breadcrumb>
                 </div>
 
-                {/* Right Section - Search + Notifications + Quick Actions + Theme + User */}
+                {/* Right Section - Notifications + Quick Actions + Theme + User */}
                 <div className="flex items-center gap-2 ml-auto">
-                    {/* Global Search - Stripe-like federated search */}
-                    <GlobalSearch />
-
                     {/* Notifications */}
                     <Notifications />
 

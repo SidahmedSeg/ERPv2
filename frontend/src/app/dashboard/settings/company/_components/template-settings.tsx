@@ -24,7 +24,7 @@ export function TemplateSettings() {
 
   useEffect(() => {
     fetchSettings();
-  }, [token]);
+  }, [accessToken]);
 
   const fetchSettings = async () => {
     try {
@@ -33,7 +33,7 @@ export function TemplateSettings() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/settings/company`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
@@ -96,7 +96,7 @@ export function TemplateSettings() {
         {
           method: 'POST',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
           body: formData,
         }
@@ -120,7 +120,7 @@ export function TemplateSettings() {
         {
           method: 'PUT',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
@@ -157,7 +157,7 @@ export function TemplateSettings() {
         {
           method: 'PUT',
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({

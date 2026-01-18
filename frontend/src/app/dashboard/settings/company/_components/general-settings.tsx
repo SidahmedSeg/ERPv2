@@ -96,11 +96,11 @@ export function GeneralSettings() {
     if (accessToken) {
       fetchSettings();
     }
-  }, [token]);
+  }, [accessToken]);
 
   // Load Google Places API
   useEffect(() => {
-    if (typeof window !== "undefined" && !window.google) {
+    if (typeof window !== "undefined" && !(window as any).google) {
       const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY;
       if (!apiKey) {
         console.error("Google Places API key is not configured");
@@ -119,7 +119,7 @@ export function GeneralSettings() {
         console.error("Failed to load Google Maps API");
       };
       document.head.appendChild(script);
-    } else if (window.google) {
+    } else if ((window as any).google) {
       console.log("Google Maps API already loaded");
       setGoogleLoaded(true);
     }
@@ -176,7 +176,7 @@ export function GeneralSettings() {
             fields: ["address_components", "formatted_address"],
           };
 
-          const autocomplete = new window.google.maps.places.Autocomplete(autocompleteInputRef.current, options);
+          const autocomplete = new (window as any).google.maps.places.Autocomplete(autocompleteInputRef.current, options);
 
           // Handle pac-container interaction properly
           const handlePacContainerSetup = () => {
@@ -278,7 +278,7 @@ export function GeneralSettings() {
     try {
       const response = await fetch("http://localhost:8080/api/settings/company", {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 
@@ -324,7 +324,8 @@ export function GeneralSettings() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(updates),
       });

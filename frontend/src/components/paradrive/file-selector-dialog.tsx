@@ -99,7 +99,7 @@ export function FileSelectorDialog({
                 `${process.env.NEXT_PUBLIC_API_URL}/api/folders/${folderId}/contents`,
                 {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${accessToken}`,
                     },
                 }
             );
@@ -154,7 +154,7 @@ export function FileSelectorDialog({
                     {
                         method: 'POST',
                         headers: {
-                            Authorization: `Bearer ${token}`,
+                            Authorization: `Bearer ${accessToken}`,
                         },
                         body: formData,
                     }

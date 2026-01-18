@@ -84,7 +84,7 @@ export function TaxSettings() {
   const fetchTaxTypes = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/settings/tax-types", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       const data = await response.json();
       if (data.success) {
@@ -100,7 +100,7 @@ export function TaxSettings() {
   const fetchTaxRates = async () => {
     try {
       const response = await fetch("http://localhost:8080/api/settings/tax-rates", {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       const data = await response.json();
       if (data.success) {
@@ -118,7 +118,7 @@ export function TaxSettings() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(typeForm),
       });
@@ -143,7 +143,7 @@ export function TaxSettings() {
     try {
       const response = await fetch(`http://localhost:8080/api/settings/tax-types/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       const data = await response.json();
@@ -163,7 +163,7 @@ export function TaxSettings() {
         method: editingRate ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(rateForm),
       });
@@ -207,7 +207,7 @@ export function TaxSettings() {
     try {
       const response = await fetch(`http://localhost:8080/api/settings/tax-rates/${id}`, {
         method: "DELETE",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       const data = await response.json();
@@ -224,7 +224,7 @@ export function TaxSettings() {
     try {
       const response = await fetch(`http://localhost:8080/api/settings/tax-rates/${id}/default`, {
         method: "PATCH",
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
 
       const data = await response.json();

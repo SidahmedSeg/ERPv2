@@ -43,7 +43,7 @@ export function SecuritySection() {
         if (!accessToken) return;
         try {
             setLoading(true);
-            const data = await twoFactorApi.getStatus(token);
+            const data = await twoFactorApi.getStatus(accessToken);
             setStatus(data);
         } catch (error: any) {
             console.error('Error loading 2FA status:', error);
@@ -57,7 +57,7 @@ export function SecuritySection() {
         if (!accessToken) return;
         try {
             setProcessing(true);
-            const data = await twoFactorApi.setup(token);
+            const data = await twoFactorApi.setup(accessToken);
             setSetupData(data);
             setSetupStep('qr');
             setIsSetupDialogOpen(true);
@@ -70,7 +70,7 @@ export function SecuritySection() {
     };
 
     const handleVerifyAndEnable = async () => {
-        if (!token || !setupData) return;
+        if (!accessToken || !setupData) return;
 
         if (!verificationCode || verificationCode.length !== 6) {
             toast.error('Please enter a valid 6-digit code');

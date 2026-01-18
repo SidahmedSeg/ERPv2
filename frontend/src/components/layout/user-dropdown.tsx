@@ -19,22 +19,22 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuthStore } from '@/store/auth-store';
 import { useRouter } from 'next/navigation';
 import { useTheme } from 'next-themes';
-import { api } from '@/lib/api';
+import { authApi } from '@/lib/api';
 import { LANGUAGES } from '@/lib/constants';
 
 export function UserDropdown() {
     const router = useRouter();
-    const { user, clearAuth } = useAuthStore();
+    const { user, logout } = useAuthStore();
     const { theme, setTheme } = useTheme();
     const [language, setLanguage] = useState('en');
 
     const handleLogout = async () => {
         try {
-            await api.logout();
+            await authApi.logout();
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
-            clearAuth();
+            logout();
             router.push('/auth/login');
         }
     };

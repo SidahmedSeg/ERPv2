@@ -11,23 +11,23 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useAuthStore } from '@/store/auth-store';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { api, authApi } from '@/lib/api';
 import Image from 'next/image';
 
 export function CompanyDropdown() {
     const router = useRouter();
-    const { user, tenantSlug, clearAuth, token } = useAuthStore();
+    const { user, tenant, logout, accessToken } = useAuthStore();
     const [open, setOpen] = useState(false);
     const [companyLogo, setCompanyLogo] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchCompanyLogo = async () => {
-            if (!token) return;
+            if (!accessToken) return;
 
             try {
                 const response = await fetch("http://localhost:8080/api/settings/company", {
                     headers: {
-                        Authorization: `Bearer ${token}`,
+                        Authorization: `Bearer ${accessToken}`,
                     },
                 });
 
@@ -48,22 +48,22 @@ export function CompanyDropdown() {
         return () => {
             if (interval) clearInterval(interval);
         };
-    }, [token, open]);
+    }, [accessToken, open]);
 
     const handleLogout = async () => {
         try {
-            await api.logout();
+            await authApi.logout();
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
-            clearAuth();
+            logout();
             router.push('/auth/login');
         }
     };
 
     // Convert slug to company name (capitalize first letter)
-    const companyName = tenantSlug
-        ? tenantSlug.charAt(0).toUpperCase() + tenantSlug.slice(1)
+    const companyName = tenant?.slug
+        ? tenant.slug.charAt(0).toUpperCase() + tenant.slug.slice(1)
         : 'Company';
 
     return (
@@ -90,7 +90,7 @@ export function CompanyDropdown() {
                             {companyName}
                         </p>
                         <p className="text-xs text-text-secondary line-clamp-1">
-                            {tenantSlug}.myerp.com
+                            {tenant?.slug}.myerp.com
                         </p>
                     </div>
                     <ChevronDown className={`h-4 w-4 text-text-secondary transition-transform ${open ? 'rotate-180' : ''}`} />

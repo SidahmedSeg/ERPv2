@@ -3,6 +3,7 @@ export interface User {
   id: string;
   tenant_id: string;
   email: string;
+  email_verified: boolean;
   first_name: string;
   last_name: string;
   phone?: string;

@@ -1,7 +1,15 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback, useRef } from 'react';
-import { UserPermissions } from '@/types/permissions';
+
+interface Permission {
+  resource: string;
+  action: string;
+}
+
+interface UserPermissions {
+  permissions: Permission[];
+}
 
 interface PermissionContextType {
   permissions: UserPermissions | null;

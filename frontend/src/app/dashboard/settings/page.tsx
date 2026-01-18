@@ -57,7 +57,7 @@ export default function SettingsPage() {
 
 // Account Settings Tab
 function AccountSettings() {
-  const { user, tenant, setAuth } = useAuthStore();
+  const { user, tenant, setAuth, setUser } = useAuthStore();
   const [formData, setFormData] = useState({
     first_name: user?.first_name || '',
     last_name: user?.last_name || '',
@@ -77,8 +77,10 @@ function AccountSettings() {
 
     try {
       const response = await userApi.update(user.id, formData);
-      const updatedUser = response.data.data;
-      setAuth({ user: updatedUser });
+      const updatedUser = response.data.data?.user;
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
       setSuccess('Account updated successfully');
     } catch (error) {
       setError(handleApiError(error));
@@ -259,9 +261,9 @@ function SecuritySettings() {
     }
 
     // Validate password strength
-    const errors = validatePassword(formData.new_password);
-    if (errors.length > 0) {
-      setPasswordErrors(errors);
+    const validation = validatePassword(formData.new_password);
+    if (!validation.valid) {
+      setPasswordErrors(validation.errors);
       return;
     }
 
@@ -374,7 +376,7 @@ function SecuritySettings() {
 
 // Preferences Settings Tab
 function PreferencesSettings() {
-  const { user, setAuth } = useAuthStore();
+  const { user, setAuth, setUser } = useAuthStore();
   const [formData, setFormData] = useState({
     timezone: user?.timezone || 'UTC',
     language: user?.language || 'en',
@@ -414,8 +416,10 @@ function PreferencesSettings() {
 
     try {
       const response = await userApi.update(user.id, formData);
-      const updatedUser = response.data.data;
-      setAuth({ user: updatedUser });
+      const updatedUser = response.data.data?.user;
+      if (updatedUser) {
+        setUser(updatedUser);
+      }
       setSuccess('Preferences updated successfully');
     } catch (error) {
       setError(handleApiError(error));

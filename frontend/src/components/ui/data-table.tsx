@@ -1,7 +1,19 @@
 "use client";
 
 import { ReactNode } from "react";
-import { Column } from "@/types/table";
+
+export interface Column<TData> {
+  id: string;
+  header: string;
+  accessor?: string | ((row: TData) => any);
+  cell?: (row: TData) => ReactNode;
+  sortable?: boolean;
+  sortKey?: string;
+  align?: "left" | "center" | "right";
+  width?: string;
+  headerClassName?: string;
+  className?: string;
+}
 
 interface DataTableProps<TData> {
   data?: TData[] | null;

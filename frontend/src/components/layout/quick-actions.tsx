@@ -82,7 +82,7 @@ export function QuickActions() {
     };
 
     // Check if user is admin
-    const isAdmin = user?.role === 'admin' || user?.role === 'superadmin';
+    const isAdmin = user?.roles?.some(role => role.name === 'admin' || role.name === 'superadmin') || false;
 
     return (
         <>
