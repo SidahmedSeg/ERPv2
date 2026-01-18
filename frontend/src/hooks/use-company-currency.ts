@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/auth-store';
 
 export function useCompanyCurrency() {
-  const { token } = useAuthStore();
+  const { accessToken } = useAuthStore();
   const [currency, setCurrency] = useState<string>('USD');
   const [loading, setLoading] = useState(true);
 

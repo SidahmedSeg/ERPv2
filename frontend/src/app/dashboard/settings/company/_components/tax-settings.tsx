@@ -55,7 +55,7 @@ interface TaxRate {
 }
 
 export function TaxSettings() {
-  const { token } = useAuthStore();
+  const { accessToken } = useAuthStore();
   const [taxTypes, setTaxTypes] = useState<TaxType[]>([]);
   const [taxRates, setTaxRates] = useState<TaxRate[]>([]);
   const [loading, setLoading] = useState(true);

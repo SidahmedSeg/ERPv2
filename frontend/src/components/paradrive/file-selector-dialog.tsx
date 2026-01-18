@@ -67,7 +67,7 @@ export function FileSelectorDialog({
     title = 'Select Files',
     description = 'Choose files from ParaDrive or upload new ones',
 }: FileSelectorDialogProps) {
-    const { token } = useAuthStore();
+    const { accessToken } = useAuthStore();
     const [files, setFiles] = useState<FileItem[]>([]);
     const [folders, setFolders] = useState<FolderItem[]>([]);
     const [loading, setLoading] = useState(true);

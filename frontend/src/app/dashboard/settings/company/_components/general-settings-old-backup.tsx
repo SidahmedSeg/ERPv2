@@ -55,7 +55,7 @@ interface CompanySettings {
 }
 
 export function GeneralSettings() {
-  const { token } = useAuthStore();
+  const { accessToken } = useAuthStore();
   const [settings, setSettings] = useState<CompanySettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

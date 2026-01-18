@@ -33,7 +33,7 @@ interface SearchResult {
 export function GlobalSearch() {
     const router = useRouter();
     const pathname = usePathname();
-    const { token } = useAuthStore();
+    const { accessToken } = useAuthStore();
     const [query, setQuery] = useState('');
     const [loading, setLoading] = useState(false);
     const [showResults, setShowResults] = useState(false);

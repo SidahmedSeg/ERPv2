@@ -15,7 +15,7 @@ interface CompanySettings {
 }
 
 export function TemplateSettings() {
-  const { token } = useAuthStore();
+  const { accessToken } = useAuthStore();
   const [settings, setSettings] = useState<CompanySettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);

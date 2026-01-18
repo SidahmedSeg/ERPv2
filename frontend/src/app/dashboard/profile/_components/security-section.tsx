@@ -23,7 +23,7 @@ import { Shield, Loader2, Check, Copy, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function SecuritySection() {
-    const { token } = useAuthStore();
+    const { accessToken } = useAuthStore();
     const [status, setStatus] = useState<TwoFactorStatus | null>(null);
     const [loading, setLoading] = useState(true);
     const [isSetupDialogOpen, setIsSetupDialogOpen] = useState(false);

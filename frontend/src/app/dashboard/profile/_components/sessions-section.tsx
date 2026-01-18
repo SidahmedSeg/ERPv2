@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 
 export function SessionsSection() {
-    const { token } = useAuthStore();
+    const { accessToken } = useAuthStore();
     const [sessions, setSessions] = useState<UserSession[]>([]);
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState(false);
