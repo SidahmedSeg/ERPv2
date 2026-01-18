@@ -59,7 +59,12 @@ export default function SignupPage() {
                 router.push('/auth/verify?status=sent');
             }
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Registration failed. Please try again.');
+            const errorMessage = err.response?.data?.error?.message
+                || err.response?.data?.error
+                || err.response?.data?.message
+                || err.message
+                || 'Registration failed. Please try again.';
+            setError(typeof errorMessage === 'string' ? errorMessage : 'Registration failed. Please try again.');
         } finally {
             setLoading(false);
         }

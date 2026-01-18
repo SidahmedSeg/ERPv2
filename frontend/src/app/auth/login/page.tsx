@@ -89,7 +89,12 @@ export default function LoginPage() {
                 }
             }
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Login failed. Please try again.');
+            const errorMessage = err.response?.data?.error?.message
+                || err.response?.data?.error
+                || err.response?.data?.message
+                || err.message
+                || 'Login failed. Please try again.';
+            setError(typeof errorMessage === 'string' ? errorMessage : 'Login failed. Please try again.');
             setLoading(false);
             setShowTenantSelector(false);
         }
@@ -144,7 +149,12 @@ export default function LoginPage() {
                 }
             }
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
+            const errorMessage = err.response?.data?.error?.message
+                || err.response?.data?.error
+                || err.response?.data?.message
+                || err.message
+                || 'Login failed. Please check your credentials.';
+            setError(typeof errorMessage === 'string' ? errorMessage : 'Login failed. Please check your credentials.');
             setLoading(false);
             setIsNavigating(false);
         }
