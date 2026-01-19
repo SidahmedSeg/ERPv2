@@ -88,7 +88,7 @@ func (s *EmailService) SendEmail(to, subject, body string) error {
 
 // SendTenantVerificationEmail sends a verification email for tenant registration
 func (s *EmailService) SendTenantVerificationEmail(email, companyName string, token uuid.UUID) error {
-	verifyURL := fmt.Sprintf("%s/verify-email?token=%s", s.app.FrontendURL, token)
+	verifyURL := fmt.Sprintf("%s/auth/verify?token=%s", s.app.FrontendURL, token)
 
 	tmpl := `
 <!DOCTYPE html>
