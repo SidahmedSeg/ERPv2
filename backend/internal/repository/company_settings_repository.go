@@ -91,12 +91,29 @@ func (r *CompanySettingsRepository) Update(ctx context.Context, tenantID uuid.UU
 		return &settings, nil
 	}
 
+	// Whitelist of allowed column names to prevent SQL injection
+	allowedColumns := map[string]bool{
+		"company_name": true, "legal_name": true, "industry": true,
+		"employee_count": true, "founded_date": true, "website": true,
+		"description": true, "email": true, "phone": true, "fax": true,
+		"street_address": true, "city": true, "state": true,
+		"postal_code": true, "country": true, "fiscal_year_start": true,
+		"default_currency": true, "date_format": true, "time_zone": true,
+		"language": true, "tax_id": true, "registration_number": true,
+		"vat_number": true, "nif_number": true, "ai_number": true,
+		"logo_url": true, "preferences": true,
+	}
+
 	// Build dynamic UPDATE query
 	query := "UPDATE company_settings SET updated_at = NOW(), updated_by = $1"
 	args := []interface{}{updatedBy}
 	argIndex := 2
 
 	for field, value := range updates {
+		// Security: Only allow whitelisted column names
+		if !allowedColumns[field] {
+			continue
+		}
 		query += fmt.Sprintf(", %s = $%d", field, argIndex)
 		args = append(args, value)
 		argIndex++

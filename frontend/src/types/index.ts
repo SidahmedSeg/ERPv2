@@ -221,7 +221,7 @@ export interface CompanySettings {
   company_name: string;
   legal_business_name?: string;
   industry?: string;
-  speciality?: string;
+  specialty?: string;
   company_size?: string;
   founded_date?: string;
   website_url?: string;

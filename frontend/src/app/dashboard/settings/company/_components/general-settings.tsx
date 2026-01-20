@@ -23,6 +23,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { DatePicker } from "@/components/ui/date-picker";
 import { INDUSTRIES } from "@/lib/industries";
 import { COUNTRY_CODES } from "@/lib/country-codes";
+import { companySettingsApi } from "@/lib/api/company-settings";
 import Image from "next/image";
 import { format } from "date-fns";
 
@@ -249,14 +250,9 @@ export function GeneralSettings() {
 
   const fetchSettings = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:18080/api";
-      const response = await fetch(`${apiUrl}/settings/company`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await companySettingsApi.getSettings();
+      const data = response.data;
 
-      const data = await response.json();
       if (data.success) {
         if (data.data) {
           setSettings(data.data);
@@ -294,17 +290,9 @@ export function GeneralSettings() {
   const updateSettings = async (updates: Partial<CompanySettings>) => {
     setSaving(true);
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:18080/api";
-      const response = await fetch(`${apiUrl}/settings/company`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(updates),
-      });
+      const response = await companySettingsApi.updateSettings(updates);
+      const data = response.data;
 
-      const data = await response.json();
       if (data.success) {
         toast.success("Settings updated successfully");
         setSettings(data.data);
