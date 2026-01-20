@@ -178,35 +178,8 @@ export function GeneralSettings() {
 
           const autocomplete = new (window as any).google.maps.places.Autocomplete(autocompleteInputRef.current, options);
 
-          // Handle pac-container interaction properly
-          const handlePacContainerSetup = () => {
-            // Wait a bit for pac-container to be created
-            setTimeout(() => {
-              const pacContainers = document.querySelectorAll('.pac-container');
-              if (pacContainers.length > 0) {
-                const pacContainer = pacContainers[pacContainers.length - 1] as HTMLElement;
-
-                // Prevent blur on mousedown but allow the click to go through
-                pacContainer.addEventListener('mousedown', (e) => {
-                  // Don't prevent default - let Google handle it
-                  // Just keep the input focused
-                  if (autocompleteInputRef.current) {
-                    setTimeout(() => {
-                      autocompleteInputRef.current?.focus();
-                    }, 0);
-                  }
-                });
-
-                console.log('Attached event handlers to pac-container');
-              }
-            }, 150);
-          };
-
-          // Listen for input events to know when dropdown appears
-          autocompleteInputRef.current.addEventListener('input', handlePacContainerSetup);
-
-          // Also setup on initialization
-          handlePacContainerSetup();
+          // Note: z-index for pac-container is handled in globals.css
+          // No additional JavaScript configuration needed for modal compatibility
 
           autocomplete.addListener("place_changed", () => {
             console.log("Place changed event fired");
@@ -276,7 +249,8 @@ export function GeneralSettings() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/settings/company", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:18080/api";
+      const response = await fetch(`${apiUrl}/settings/company`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -320,11 +294,11 @@ export function GeneralSettings() {
   const updateSettings = async (updates: Partial<CompanySettings>) => {
     setSaving(true);
     try {
-      const response = await fetch("http://localhost:8080/api/settings/company", {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:18080/api";
+      const response = await fetch(`${apiUrl}/settings/company`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-
           Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify(updates),
