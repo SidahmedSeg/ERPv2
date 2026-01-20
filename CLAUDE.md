@@ -25,6 +25,55 @@ Unlike traditional schema-per-tenant approaches, MyERP v2 uses **PostgreSQL Row-
 
 ---
 
+## 🤖 Claude Code Skills & Plugins
+
+**Available Skills:** Use these specialized skills for specific development tasks.
+
+### 1. **feature-dev** - Guided Feature Development
+- **Purpose:** Systematic feature development with codebase understanding and architecture focus
+- **When to use:**
+  - Planning new features
+  - Implementing complex multi-step features
+  - Need architectural guidance
+  - Want structured implementation approach
+- **Usage:** `/feature-dev` or use Skill tool with `skill: "feature-dev"`
+- **Benefits:**
+  - Explores codebase before implementation
+  - Considers architecture and patterns
+  - Provides step-by-step implementation plan
+  - Maintains code quality and consistency
+
+### 2. **frontend-design** - Production-Grade UI Components
+- **Purpose:** Create distinctive, production-ready frontend interfaces with exceptional design quality
+- **When to use:**
+  - Building new UI components
+  - Creating pages or interfaces
+  - Need polished, professional design
+  - Want to avoid generic AI aesthetics
+- **Usage:** `/frontend-design` or use Skill tool with `skill: "frontend-design"`
+- **Benefits:**
+  - Production-ready code
+  - Visually striking and memorable design
+  - Fully accessible components
+  - Dark mode support
+  - Custom animations and interactions
+- **Examples:**
+  - Created refined DatePicker component with month/year dropdowns
+  - Enhanced Company Settings forms with better UX
+
+**How to invoke:**
+```typescript
+// Direct skill invocation
+Skill({ skill: "feature-dev" })
+Skill({ skill: "frontend-design", args: "Build a data table component" })
+
+// Or use slash commands in chat
+/feature-dev
+/frontend-design
+```
+
+---
+
 ## 🔑 Critical RLS Pattern
 
 **NEVER query tenant-scoped tables directly.** Always use the RLS context wrapper:
