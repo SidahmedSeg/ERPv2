@@ -740,7 +740,9 @@ export function GeneralSettings() {
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="founded_date">Founded Date</Label>
+                <Label htmlFor="founded_date" className="text-sm font-medium">
+                  Founded Date
+                </Label>
                 <DatePicker
                   date={companyInfoForm.founded_date ? new Date(companyInfoForm.founded_date) : undefined}
                   onDateChange={(date) =>
@@ -749,9 +751,19 @@ export function GeneralSettings() {
                       founded_date: date ? format(date, "yyyy-MM-dd") : ""
                     })
                   }
-                  placeholder="Select founded date"
+                  placeholder="When was your company founded?"
+                  formatDate={(date) => {
+                    return date.toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })
+                  }}
                   className="bg-white"
                 />
+                <p className="text-xs text-muted-foreground">
+                  The official date your company was established
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="website_url">Website URL</Label>
@@ -1071,7 +1083,9 @@ export function GeneralSettings() {
           <div className="space-y-4 py-4">
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="fiscal_year_start">Fiscal Year Start</Label>
+                <Label htmlFor="fiscal_year_start" className="text-sm font-medium">
+                  Fiscal Year Start
+                </Label>
                 <DatePicker
                   date={fiscalForm.fiscal_year_start ? new Date(fiscalForm.fiscal_year_start) : undefined}
                   onDateChange={(date) =>
@@ -1080,9 +1094,18 @@ export function GeneralSettings() {
                       fiscal_year_start: date ? format(date, "MMM d") : ""
                     })
                   }
-                  placeholder="Select date"
+                  placeholder="Select fiscal year start date"
+                  formatDate={(date) => {
+                    return date.toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric'
+                    })
+                  }}
                   className="bg-white"
                 />
+                <p className="text-xs text-muted-foreground">
+                  First day of your fiscal year (e.g., January 1)
+                </p>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="default_currency">Default Currency</Label>
