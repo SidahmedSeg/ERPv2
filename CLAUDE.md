@@ -575,18 +575,7 @@ db.SetConnMaxIdleTime(10 * time.Minute)
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBC8DmzuIo3Zz9a2pkGCp4OG0vgR6NlOesy7ETGKNWTu
 ```
 
-**SSH Private Key Location:** `~/.ssh/myerp_vps_key` (permissions: 600)
-
-**SSH Private Key:**
-```
------BEGIN OPENSSH PRIVATE KEY-----
-b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAAAMwAAAAtzc2gtZW
-QyNTUxOQAAACAQvA5s7iKN2c/WtqZBgqeDhtL4EejZTnrMuxExijVk7gAAAJB4G/dFeBv3
-RQAAAAtzc2gtZWQyNTUxOQAAACAQvA5s7iKN2c/WtqZBgqeDhtL4EejZTnrMuxExijVk7g
-AAAECgy5nrEqKEinERluWX0KZXvdCbORM07L+EIod2+t0jRBC8DmzuIo3Zz9a2pkGCp4OG
-0vgR6NlOesy7ETGKNWTuAAAAC+KAnGxvZ2lu4oCdAQI=
------END OPENSSH PRIVATE KEY-----
-```
+**SSH Private Key Location:** `~/.ssh/myerp_vps_key` (permissions: 600) - stored locally only
 
 ### Quick Access Commands
 ```bash

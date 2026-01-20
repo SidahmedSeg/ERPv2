@@ -55,7 +55,7 @@ Implement comprehensive company settings page matching the original MyERP with G
 
 ### API Key
 ```
-AIzaSyAxOFMLNk2NuAf0fojr6oRnM-MD6oM8zpA
+YOUR_GOOGLE_PLACES_API_KEY
 ```
 
 ### Integration Points
@@ -597,7 +597,7 @@ companySettingsHandler.RegisterRoutes(r, authMiddleware, permMiddleware)
 NEXT_PUBLIC_API_URL=https://app.infold.app/api
 NEXT_PUBLIC_APP_URL=https://app.infold.app
 NEXT_PUBLIC_BASE_DOMAIN=infold.app
-NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=AIzaSyAxOFMLNk2NuAf0fojr6oRnM-MD6oM8zpA
+NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=YOUR_GOOGLE_PLACES_API_KEY
 ```
 
 ### Step 2: Create Lib Files
@@ -946,7 +946,7 @@ Test each dialog:
 
 1. Go to: https://console.cloud.google.com/apis/credentials
 2. Select project (or create new one)
-3. Click on API key `AIzaSyAxOFMLNk2NuAf0fojr6oRnM-MD6oM8zpA`
+3. Click on API key `YOUR_GOOGLE_PLACES_API_KEY`
 4. Application restrictions:
    - Type: HTTP referrers
    - Add: `https://app.infold.app/*`
