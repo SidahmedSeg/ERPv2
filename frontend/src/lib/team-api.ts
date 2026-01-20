@@ -150,13 +150,13 @@ export interface AssignRolesRequest {
 
 export const permissionsApi = {
   async listAll(grouped?: boolean): Promise<Permission[] | Record<string, Permission[]>> {
-    const url = grouped ? '/api/team/permissions?grouped=true' : '/api/team/permissions';
+    const url = grouped ? '/team/permissions?grouped=true' : '/team/permissions';
     const response = await api.get(url);
     return response.data;
   },
 
   async search(query: string): Promise<Permission[]> {
-    const response = await api.get(`/api/team/permissions/search?q=${encodeURIComponent(query)}`);
+    const response = await api.get(`/team/permissions/search?q=${encodeURIComponent(query)}`);
     return response.data;
   },
 };
@@ -167,36 +167,36 @@ export const permissionsApi = {
 
 export const rolesApi = {
   async list(): Promise<Role[]> {
-    const response = await api.get('/api/team/roles');
+    const response = await api.get('/team/roles');
     return response.data;
   },
 
   async get(id: string): Promise<RoleWithPermissions> {
-    const response = await api.get(`/api/team/roles/${id}`);
+    const response = await api.get(`/team/roles/${id}`);
     return response.data;
   },
 
   async create(data: CreateRoleRequest): Promise<RoleWithPermissions> {
-    const response = await api.post('/api/team/roles', data);
+    const response = await api.post('/team/roles', data);
     return response.data;
   },
 
   async update(id: string, data: UpdateRoleRequest): Promise<RoleWithPermissions> {
-    const response = await api.put(`/api/team/roles/${id}`, data);
+    const response = await api.put(`/team/roles/${id}`, data);
     return response.data;
   },
 
   async delete(id: string): Promise<void> {
-    await api.delete(`/api/team/roles/${id}`);
+    await api.delete(`/team/roles/${id}`);
   },
 
   async getUserRoles(userId: string): Promise<Role[]> {
-    const response = await api.get(`/api/team/members/${userId}/roles`);
+    const response = await api.get(`/team/members/${userId}/roles`);
     return response.data;
   },
 
   async assignRoles(userId: string, data: AssignRolesRequest): Promise<void> {
-    await api.post(`/api/team/members/${userId}/roles`, data);
+    await api.post(`/team/members/${userId}/roles`, data);
   },
 };
 
@@ -206,31 +206,31 @@ export const rolesApi = {
 
 export const departmentsApi = {
   async list(): Promise<DepartmentWithDetails[]> {
-    const response = await api.get('/api/team/departments');
+    const response = await api.get('/team/departments');
     return response.data;
   },
 
   async get(id: string): Promise<DepartmentWithDetails> {
-    const response = await api.get(`/api/team/departments/${id}`);
+    const response = await api.get(`/team/departments/${id}`);
     return response.data;
   },
 
   async create(data: CreateDepartmentRequest): Promise<DepartmentWithDetails> {
-    const response = await api.post('/api/team/departments', data);
+    const response = await api.post('/team/departments', data);
     return response.data;
   },
 
   async update(id: string, data: UpdateDepartmentRequest): Promise<DepartmentWithDetails> {
-    const response = await api.put(`/api/team/departments/${id}`, data);
+    const response = await api.put(`/team/departments/${id}`, data);
     return response.data;
   },
 
   async delete(id: string): Promise<void> {
-    await api.delete(`/api/team/departments/${id}`);
+    await api.delete(`/team/departments/${id}`);
   },
 
   async getMembers(id: string): Promise<TeamMember[]> {
-    const response = await api.get(`/api/team/departments/${id}/members`);
+    const response = await api.get(`/team/departments/${id}/members`);
     return response.data;
   },
 };
@@ -250,36 +250,36 @@ export const teamMembersApi = {
     if (params?.department_id) searchParams.append('department_id', params.department_id);
     if (params?.with_roles) searchParams.append('with_roles', 'true');
 
-    const url = `/api/team/members${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
+    const url = `/team/members${searchParams.toString() ? '?' + searchParams.toString() : ''}`;
     const response = await api.get(url);
     return response.data;
   },
 
   async get(id: string, withRoles?: boolean): Promise<TeamMember | TeamMemberWithRoles> {
-    const url = `/api/team/members/${id}${withRoles ? '?with_roles=true' : ''}`;
+    const url = `/team/members/${id}${withRoles ? '?with_roles=true' : ''}`;
     const response = await api.get(url);
     return response.data;
   },
 
   async update(id: string, data: UpdateMemberRequest): Promise<TeamMember> {
-    const response = await api.put(`/api/team/members/${id}`, data);
+    const response = await api.put(`/team/members/${id}`, data);
     return response.data;
   },
 
   async updateStatus(id: string, data: UpdateMemberStatusRequest): Promise<void> {
-    await api.patch(`/api/team/members/${id}/status`, data);
+    await api.patch(`/team/members/${id}/status`, data);
   },
 
   async delete(id: string): Promise<void> {
-    await api.delete(`/api/team/members/${id}`);
+    await api.delete(`/team/members/${id}`);
   },
 
   async updateAvatar(id: string, avatarUrl: string): Promise<void> {
-    await api.put(`/api/team/members/${id}/avatar`, { avatar_url: avatarUrl });
+    await api.put(`/team/members/${id}/avatar`, { avatar_url: avatarUrl });
   },
 
   async getStats(): Promise<Record<string, number>> {
-    const response = await api.get('/api/team/members/stats');
+    const response = await api.get('/team/members/stats');
     return response.data;
   },
 };
@@ -290,30 +290,30 @@ export const teamMembersApi = {
 
 export const invitationsApi = {
   async list(status?: string): Promise<InvitationWithDetails[]> {
-    const url = status ? `/api/team/invitations?status=${status}` : '/api/team/invitations';
+    const url = status ? `/team/invitations?status=${status}` : '/team/invitations';
     const response = await api.get(url);
     return response.data;
   },
 
   async get(id: string): Promise<Invitation> {
-    const response = await api.get(`/api/team/invitations/${id}`);
+    const response = await api.get(`/team/invitations/${id}`);
     return response.data;
   },
 
   async create(data: InviteMemberRequest): Promise<Invitation> {
-    const response = await api.post('/api/team/invitations', data);
+    const response = await api.post('/team/invitations', data);
     return response.data;
   },
 
   async resend(id: string): Promise<void> {
-    await api.post(`/api/team/invitations/${id}/resend`);
+    await api.post(`/team/invitations/${id}/resend`);
   },
 
   async revoke(id: string): Promise<void> {
-    await api.post(`/api/team/invitations/${id}/revoke`);
+    await api.post(`/team/invitations/${id}/revoke`);
   },
 
   async delete(id: string): Promise<void> {
-    await api.delete(`/api/team/invitations/${id}`);
+    await api.delete(`/team/invitations/${id}`);
   },
 };
