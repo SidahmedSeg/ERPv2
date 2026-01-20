@@ -112,19 +112,12 @@ func (h *AuthHandler) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Extract tenant ID from context (set by tenant resolution middleware)
-	tenantID, err := middleware.GetTenantIDFromContext(r.Context())
-	if err != nil {
-		utils.BadRequest(w, "Tenant context required")
-		return
-	}
-
 	// Get device info
 	deviceInfo := utils.ParseDeviceInfo(r)
 	ipAddress := utils.GetClientIP(r)
 
-	// Login
-	response, err := h.authService.LoginWithTenant(r.Context(), tenantID, &req, deviceInfo, ipAddress)
+	// Login (email-based, supports multi-tenant selection)
+	response, err := h.authService.Login(r.Context(), &req, deviceInfo, ipAddress)
 	if err != nil {
 		utils.Unauthorized(w, err.Error())
 		return
@@ -402,9 +395,9 @@ func (h *AuthHandler) RegisterRoutes(r chi.Router, authMiddleware *middleware.Au
 		r.Post("/register", h.RegisterTenant)
 		r.Post("/verify-email", h.VerifyEmail)
 
-		// Login requires tenant context
-		r.With(tenantMiddleware.RequireTenant).Post("/login", h.Login)
-		r.With(tenantMiddleware.RequireTenant).Post("/verify-2fa", h.Verify2FA)
+		// Login uses email-based authentication (no tenant context required)
+		r.Post("/login", h.Login)
+		r.Post("/verify-2fa", h.Verify2FA)
 
 		r.Post("/refresh", h.RefreshToken)
 

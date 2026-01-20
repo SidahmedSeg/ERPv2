@@ -62,6 +62,7 @@ func (s *Router) Setup() *chi.Mux {
 	roleRepo := repository.NewRoleRepository(s.db)
 	permissionRepo := repository.NewPermissionRepository(s.db)
 	userRoleRepo := repository.NewUserRoleRepository(s.db)
+	companySettingsRepo := repository.NewCompanySettingsRepository(s.db)
 
 	// Initialize services
 	jwtService := services.NewJWTService(&s.config.JWT)
@@ -72,6 +73,7 @@ func (s *Router) Setup() *chi.Mux {
 	sessionService := services.NewSessionService(s.db)
 	invitationService := services.NewInvitationService(s.db, userRepo, userRoleRepo, emailService)
 	auditService := services.NewAuditService(s.db)
+	companySettingsService := services.NewCompanySettingsService(companySettingsRepo, tenantRepo, auditService)
 
 	// Initialize middleware
 	tenantMiddleware := appMiddleware.NewTenantMiddleware(tenantRepo)
@@ -88,6 +90,7 @@ func (s *Router) Setup() *chi.Mux {
 	invitationHandler := handlers.NewInvitationHandler(invitationService)
 	auditHandler := handlers.NewAuditHandler(auditService)
 	securityHandler := handlers.NewSecurityHandler(auditService, sessionService, twoFactorService)
+	companySettingsHandler := handlers.NewCompanySettingsHandler(companySettingsService)
 
 	// Health check endpoint
 	s.router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
@@ -119,6 +122,9 @@ func (s *Router) Setup() *chi.Mux {
 		// Invitation routes already registered above
 		auditHandler.RegisterRoutes(r, authMiddleware, permMiddleware)
 		securityHandler.RegisterRoutes(r, authMiddleware, permMiddleware)
+
+		// Company Settings
+		companySettingsHandler.RegisterRoutes(r, authMiddleware)
 	})
 
 	return s.router

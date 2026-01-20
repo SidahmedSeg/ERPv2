@@ -114,3 +114,8 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* Google Places Autocomplete - Fix for modal/dialog compatibility */
+.pac-container {
+  z-index: 99999 !important;
+}

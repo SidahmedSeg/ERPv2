@@ -213,3 +213,41 @@ export interface DashboardStats {
   total_roles: number;
   pending_invitations: number;
 }
+
+// Company Settings types
+export interface CompanySettings {
+  id: string;
+  tenant_id: string;
+  company_name: string;
+  legal_business_name?: string;
+  industry?: string;
+  specialty?: string;
+  company_size?: string;
+  founded_date?: string;
+  website_url?: string;
+  logo_url?: string;
+  primary_email?: string;
+  support_email?: string;
+  phone_number?: string;
+  fax?: string;
+  street_address?: string;
+  city?: string;
+  state?: string;
+  postal_code?: string;
+  country?: string;
+  timezone: string;
+  working_days: Record<string, boolean>;
+  working_hours_start: string;
+  working_hours_end: string;
+  fiscal_year_start?: string;
+  default_currency: string;
+  date_format: string;
+  number_format: string;
+  rc_number?: string;
+  nif_number?: string;
+  nis_number?: string;
+  ai_number?: string;
+  capital_social?: number;
+  created_at: string;
+  updated_at: string;
+}

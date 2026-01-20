@@ -215,18 +215,24 @@ func (h *ExampleHandler) List(w http.ResponseWriter, r *http.Request) {
 
 **Tool:** golang-migrate
 **Location:** `backend/migrations/`
-**Count:** 14 migrations (extensions → tenants → users → RLS → roles → permissions → audit)
+**Count:** 15 migrations (extensions → tenants → users → RLS → roles → permissions → audit → company_settings)
 
 ### Commands
 
+**IMPORTANT:** PostgreSQL runs on port **15433** (not 5432) via docker-compose.
+
 ```bash
-# Run all migrations up
+# Run all migrations up (use correct port 15433)
+cd backend
+export DATABASE_URL="postgresql://myerp:myerp_password@localhost:15433/myerp_v2?sslmode=disable"
 go run cmd/migrate/main.go up
 
 # Rollback one migration
+export DATABASE_URL="postgresql://myerp:myerp_password@localhost:15433/myerp_v2?sslmode=disable"
 go run cmd/migrate/main.go down
 
 # Rollback N migrations
+export DATABASE_URL="postgresql://myerp:myerp_password@localhost:15433/myerp_v2?sslmode=disable"
 go run cmd/migrate/main.go down 3
 
 # Create new migration
@@ -245,6 +251,7 @@ migrate create -ext sql -dir migrations -seq add_new_table
 - **012:** Audit logs with JSONB metadata
 - **013:** Helper functions (`get_user_permissions()`, `has_permission()`)
 - **014:** Seed system roles (owner, admin, manager, user)
+- **015:** Company settings table with RLS (company info, contact, address, fiscal)
 
 ---
 
@@ -554,7 +561,49 @@ db.SetConnMaxIdleTime(10 * time.Minute)
 
 ---
 
-**Last Updated:** January 17, 2026
+## 🚀 Production VPS Details
+
+**VPS IP:** 167.86.117.179
+**Domain:** infold.app
+**App URL:** https://app.infold.app
+**Project Path:** `/opt/myerp-v2`
+
+### SSH Access
+
+**SSH Public Key:**
+```
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBC8DmzuIo3Zz9a2pkGCp4OG0vgR6NlOesy7ETGKNWTu
+```
+
+**SSH Private Key Location:** `~/.ssh/myerp_vps_key` (permissions: 600) - stored locally only
+
+### Quick Access Commands
+```bash
+# SSH into VPS (using the private key)
+ssh -i ~/.ssh/myerp_vps_key root@167.86.117.179
+
+# Check running containers
+ssh -i ~/.ssh/myerp_vps_key root@167.86.117.179 "docker ps"
+
+# View backend logs
+ssh -i ~/.ssh/myerp_vps_key root@167.86.117.179 "docker logs myerp-backend -f"
+
+# View frontend logs
+ssh -i ~/.ssh/myerp_vps_key root@167.86.117.179 "docker logs myerp-frontend -f"
+
+# Restart containers
+ssh -i ~/.ssh/myerp_vps_key root@167.86.117.179 "cd /opt/myerp-v2 && docker compose -f docker-compose.prod.yml restart"
+
+# Check Caddy status
+ssh -i ~/.ssh/myerp_vps_key root@167.86.117.179 "systemctl status caddy"
+
+# View Caddy logs
+ssh -i ~/.ssh/myerp_vps_key root@167.86.117.179 "journalctl -u caddy -n 50 -f"
+```
+
+---
+
+**Last Updated:** January 18, 2026
 **Version:** 2.0.0
 **Backend Status:** Phase 1 Complete ✅
 **Frontend Status:** Phase 1.5 In Progress (60% - Dark Mode ✅)

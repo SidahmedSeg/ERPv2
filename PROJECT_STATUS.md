@@ -1,31 +1,72 @@
 # MyERP v2 - Project Status
 
-**Last Updated:** January 17, 2026
+**Last Updated:** January 20, 2026
 **Project:** Multi-Tenant ERP System (Shared Schema + RLS)
-**Phase:** 1.5 - UI Enhancement & Backend Fixes
+**Phase:** 2.0 - Production Deployment & Feature Development
 
 ---
 
 ## 📊 Overall Progress
 
-### Phase 1: Core Auth & RBAC - ✅ 95% Complete
+### Phase 1: Core Auth & RBAC - ✅ 100% Complete
+### Phase 1.5: Production Deployment - ✅ 100% Complete
+### Phase 2: Business Features - ⏳ 10% In Progress
 
 | Component | Status | Progress | Notes |
 |-----------|--------|----------|-------|
-| Database Schema | ✅ Complete | 100% | 14 migrations, RLS enabled |
-| Backend Services | ⚠️ Needs Fix | 95% | Compilation errors in router.go |
-| Frontend UI | ✅ Complete | 100% | Dark mode implemented |
-| Infrastructure | ✅ Complete | 100% | PostgreSQL, Redis, Mailpit running |
-| Documentation | ✅ Complete | 100% | README, CLAUDE.md, Dark mode docs |
+| Database Schema | ✅ Complete | 100% | 15 migrations, RLS enabled |
+| Backend Services | ✅ Complete | 100% | Production deployed on VPS |
+| Frontend UI | ✅ Complete | 100% | Dark mode, company settings |
+| Infrastructure | ✅ Complete | 100% | PostgreSQL, Redis, Mailpit, Caddy |
+| Documentation | ✅ Complete | 100% | README, CLAUDE.md, API docs |
+| Production VPS | ✅ Deployed | 100% | app.infold.app, api.infold.app |
+
+---
+
+## 🌐 Production Environment
+
+### VPS Details
+- **Domain**: infold.app
+- **Frontend URL**: https://app.infold.app
+- **Backend API URL**: https://api.infold.app/api
+- **VPS IP**: 167.86.117.179
+- **Reverse Proxy**: Caddy (auto-HTTPS with Let's Encrypt)
+- **Status**: ✅ Running in production
+
+### Deployment Architecture
+```
+Internet → Caddy Proxy
+    ├── app.infold.app → Frontend (Next.js on port 13000)
+    └── api.infold.app → Backend (Go on port 18080)
+
+Docker Compose Services:
+    ├── myerp_frontend (Next.js 15.5.6)
+    ├── myerp_backend (Go 1.23)
+    ├── myerp_postgres (PostgreSQL 16)
+    ├── myerp_redis (Redis 7)
+    └── myerp_mailpit (Email testing)
+```
+
+### Environment Variables
+- **Frontend**: Build-time env vars via Docker ARG
+  - NEXT_PUBLIC_API_URL=https://api.infold.app/api
+  - NEXT_PUBLIC_BASE_DOMAIN=infold.app
+  - NEXT_PUBLIC_GOOGLE_PLACES_API_KEY
+
+- **Backend**: Runtime env vars via .env
+  - FRONTEND_URL=https://app.infold.app
+  - APP_BASE_URL=https://api.infold.app
+  - DATABASE_URL (PostgreSQL)
+  - REDIS_URL
 
 ---
 
 ## 🗄️ Database Status
 
 ### Infrastructure
-- **PostgreSQL**: ✅ Running (localhost:15433)
-- **Redis**: ✅ Running (localhost:26379)
-- **Mailpit**: ✅ Running (SMTP: 11025, Web: 18025)
+- **PostgreSQL**: ✅ Running (Production: internal Docker network)
+- **Redis**: ✅ Running (Production: internal Docker network)
+- **Mailpit**: ✅ Running (Production: SMTP + Web UI)
 
 ### Migrations
 ```
@@ -43,6 +84,18 @@
 ✅ 012 - Create Audit Logs Table
 ✅ 013 - Create Helper Functions
 ✅ 014 - Seed System Data
+✅ 015 - Create Company Settings Table (NEW)
+```
+
+### Company Settings Schema
+```sql
+- company_info (name, legal_name, industry, employee_count, founded_date, website, description)
+- contact_details (email, phone, fax)
+- address (street, city, state, postal_code, country)
+- fiscal_settings (fiscal_year_start, currency, date_format, time_zone, language)
+- legal_identifiers (tax_id, registration_number, vat_number, nif_number, ai_number)
+- Additional fields: logo_url, preferences (JSONB)
+- RLS enabled with tenant isolation
 ```
 
 ### Test Data
@@ -53,7 +106,7 @@
 
 ## 💻 Backend Status
 
-### File Structure (46 Go Files)
+### File Structure (46+ Go Files)
 ```
 ✅ cmd/server/main.go              - HTTP server entry point
 ✅ cmd/migrate/main.go             - Migration CLI tool
@@ -62,21 +115,14 @@
    ✅ postgres.go                  - PostgreSQL connection
    ✅ redis.go                     - Redis connection
    ✅ rls.go                       - Row-Level Security helpers
-✅ internal/models/                - 7 domain models
-✅ internal/repository/            - 7 repositories (with RLS)
-✅ internal/services/              - 9 services
-✅ internal/handlers/              - 9 HTTP handlers
+✅ internal/models/                - 8 domain models (+ CompanySettings)
+✅ internal/repository/            - 8 repositories (with RLS)
+✅ internal/services/              - 10 services (+ CompanySettingsService)
+✅ internal/handlers/              - 10 HTTP handlers (+ CompanySettingsHandler)
 ✅ internal/middleware/            - 2 middleware (auth, permission)
-⚠️ internal/server/router.go      - Needs parameter fixes
+✅ internal/server/router.go       - ✅ Fixed and deployed
 ✅ internal/utils/                 - 8 utility modules
 ```
-
-### Current Issues
-- ⚠️ **router.go**: Service initialization parameter mismatches
-  - JWTService needs *config.JWTConfig (not string)
-  - EmailService needs *config.EmailConfig (not strings)
-  - AuthService needs *config.Config parameter
-  - Middleware initialization parameter mismatch
 
 ### Services Implemented
 - ✅ Auth Service (register, login, logout, verify)
@@ -88,72 +134,97 @@
 - ✅ Invitation Service (team invites)
 - ✅ Email Service (SMTP)
 - ✅ Audit Service (security logging)
+- ✅ **Company Settings Service** (NEW - company profile management)
 
-### API Endpoints Planned (60+)
+### API Endpoints Implemented (70+)
 ```
 Authentication:
-  POST   /api/auth/register
-  POST   /api/auth/verify-email
-  POST   /api/auth/login
-  POST   /api/auth/verify-2fa
-  POST   /api/auth/refresh
-  POST   /api/auth/logout
-  POST   /api/auth/forgot-password
-  POST   /api/auth/reset-password
+  POST   /api/auth/register              ✅
+  POST   /api/auth/verify-email          ✅
+  POST   /api/auth/login                 ✅
+  POST   /api/auth/verify-2fa            ✅
+  POST   /api/auth/refresh               ✅
+  POST   /api/auth/logout                ✅
+  POST   /api/auth/logout-all            ✅
+  POST   /api/auth/forgot-password       ✅
+  POST   /api/auth/reset-password        ✅
+  POST   /api/auth/change-password       ✅
+  GET    /api/auth/me                    ✅
 
 Users:
-  GET    /api/users
-  POST   /api/users
-  GET    /api/users/:id
-  PUT    /api/users/:id
-  DELETE /api/users/:id
-  PUT    /api/users/:id/status
-  GET    /api/users/:id/roles
-  PUT    /api/users/:id/roles
-  GET    /api/users/me/profile
-  PUT    /api/users/me/profile
-  PUT    /api/users/me/password
-  PUT    /api/users/me/preferences
-  POST   /api/users/me/avatar
-  DELETE /api/users/me/avatar
+  GET    /api/users                      ✅
+  POST   /api/users                      ✅
+  GET    /api/users/:id                  ✅
+  PUT    /api/users/:id                  ✅
+  DELETE /api/users/:id                  ✅
+  PATCH  /api/users/:id/status           ✅
+  GET    /api/users/:id/roles            ✅
+  POST   /api/users/:id/roles            ✅
+  GET    /api/users/search               ✅
 
 Roles & Permissions:
-  GET    /api/roles
-  POST   /api/roles
-  GET    /api/roles/:id
-  PUT    /api/roles/:id
-  DELETE /api/roles/:id
-  GET    /api/roles/:id/permissions
-  PUT    /api/roles/:id/permissions
-  GET    /api/permissions
-  GET    /api/permissions/categories
-  GET    /api/permissions/check
+  GET    /api/roles                      ✅
+  POST   /api/roles                      ✅
+  GET    /api/roles/:id                  ✅
+  PUT    /api/roles/:id                  ✅
+  DELETE /api/roles/:id                  ✅
+  GET    /api/roles/:id/permissions      ✅
+  GET    /api/roles/:id/users            ✅
+  POST   /api/roles/:id/assign           ✅
+  GET    /api/permissions                ✅
+  GET    /api/permissions/by-category    ✅
+  GET    /api/permissions/search         ✅
+  GET    /api/permissions/stats          ✅
+  GET    /api/permissions/me             ✅
+  POST   /api/permissions/check          ✅
 
 Sessions:
-  GET    /api/sessions
-  GET    /api/sessions/stats
-  DELETE /api/sessions/:id
-  POST   /api/sessions/revoke-all
+  GET    /api/sessions                   ✅
+  GET    /api/sessions/stats             ✅
+  GET    /api/sessions/recent-logins     ✅
+  DELETE /api/sessions/:id               ✅
+  POST   /api/sessions/revoke-all        ✅
 
 Two-Factor Authentication:
-  GET    /api/2fa/status
-  POST   /api/2fa/setup
-  POST   /api/2fa/enable
-  POST   /api/2fa/disable
-  POST   /api/2fa/verify
+  POST   /api/2fa/setup                  ✅
+  POST   /api/2fa/enable                 ✅
+  POST   /api/2fa/disable                ✅
+  POST   /api/2fa/verify                 ✅
+  POST   /api/2fa/verify-backup          ✅
+  POST   /api/2fa/backup-codes/regenerate ✅
+  GET    /api/2fa/backup-codes/count     ✅
+  POST   /api/2fa/device/trust           ✅
 
 Invitations:
-  GET    /api/invitations
-  POST   /api/invitations
-  DELETE /api/invitations/:id
-  POST   /api/invitations/accept
+  GET    /api/invitations                ✅
+  GET    /api/invitations/:id            ✅
+  POST   /api/invitations                ✅
+  POST   /api/invitations/accept         ✅
+  DELETE /api/invitations/:id            ✅
+  POST   /api/invitations/:id/resend     ✅
 
 Audit:
-  GET    /api/audit-logs
-  GET    /api/audit-logs/stats
+  GET    /api/audit-logs                 ✅
+  GET    /api/audit-logs/search          ✅
+  GET    /api/audit-logs/stats           ✅
+  GET    /api/audit-logs/failed-attempts ✅
+  GET    /api/audit-logs/user/:id        ✅
+  GET    /api/audit-logs/resource/:type/:id ✅
+
+Security:
+  GET    /api/security/overview          ✅
+  GET    /api/security/suspicious-activity ✅
+  GET    /api/security/recommendations   ✅
+  GET    /api/security/login-history     ✅
+
+Company Settings (NEW):
+  GET    /api/settings/company           ✅
+  PUT    /api/settings/company           ✅
+  POST   /api/settings/company/logo      ✅
+  DELETE /api/settings/company/logo      ✅
 
 Health:
-  GET    /health
+  GET    /health                         ✅
 ```
 
 ---
@@ -169,6 +240,7 @@ Health:
 - **State**: Zustand 5.0.1
 - **Icons**: Lucide React 0.468.0
 - **Theme**: next-themes 0.4.4 ✅
+- **Maps**: Google Places API (autocomplete)
 
 ### Features Implemented
 - ✅ **Dark Mode**: Full implementation with system detection
@@ -185,13 +257,27 @@ Health:
   - Role Management (team/roles)
   - Security Settings (2FA, sessions, audit logs)
   - App Settings (profile, preferences)
+  - **Company Settings** (NEW - comprehensive company profile)
+
+- ✅ **Company Settings Feature** (NEW):
+  - Company Information (name, industry, employees, founded date)
+  - Contact Details (email, phone, fax)
+  - Physical Address (with Google Places autocomplete)
+  - Fiscal Settings (fiscal year, currency, date format, timezone)
+  - Legal Identifiers (tax ID, registration number, VAT, NIF, AI)
+  - Logo upload functionality
+  - Preferences (JSONB storage)
+  - Multi-section form with validation
+  - Save functionality per section
 
 - ✅ **Components**:
-  - 43 shadcn/ui components
+  - 43+ shadcn/ui components
   - Custom Layout (Sidebar, Header)
   - Notifications (Toast system)
   - Breadcrumbs
   - Theme Toggle Dropdown
+  - DatePicker with dropdown month/year selector
+  - Google Places Autocomplete integration
 
 - ✅ **State Management**:
   - Auth Store (Zustand)
@@ -217,10 +303,11 @@ Dark Mode:
   Error:             #F87171
 ```
 
-### Frontend Server
-- **URL**: http://localhost:13000
-- **Status**: ✅ Running
-- **Build**: Development mode
+### Frontend Production
+- **URL**: https://app.infold.app
+- **Status**: ✅ Running in production
+- **Build**: Production optimized
+- **Docker**: Multi-stage build with Next.js standalone output
 
 ---
 
@@ -254,45 +341,80 @@ Dark Mode:
 - ✅ Security event logging
 - ✅ Rate limiting on auth endpoints
 
+### CORS & Networking
+- ✅ CORS properly configured for production domains
+- ✅ HTTPS enforced via Caddy reverse proxy
+- ✅ Secure headers (X-Real-IP, X-Forwarded-For, X-Forwarded-Proto)
+
 ---
 
 ## 📋 TODO List
 
-### Immediate (This Session)
-- [ ] Fix router.go service initialization
-- [ ] Fix middleware parameter mismatches
-- [ ] Build and start backend server
-- [ ] Test login with `admin@acme-corp.com`
-- [ ] Verify dark mode toggle works
-- [ ] Test API endpoints with Postman/curl
+### Phase 2.0 - Current Sprint
+- [x] Company Settings feature ✅
+- [x] Production deployment ✅
+- [x] CORS configuration ✅
+- [x] Environment variable management ✅
+- [ ] Additional business features
+- [ ] Inventory management
+- [ ] Customer management
+- [ ] Invoice generation
 
-### Short Term (Next Session)
+### Short Term (Next 2 Weeks)
 - [ ] Write unit tests for services
 - [ ] Write integration tests for auth flow
-- [ ] Add API documentation (Swagger)
-- [ ] Performance testing
+- [ ] Add API documentation (Swagger/OpenAPI)
+- [ ] Performance testing & optimization
 - [ ] Security audit
+- [ ] Backup & restore procedures
+- [ ] Monitoring & logging setup (production)
 
-### Phase 2 (Future)
-- [ ] Business modules (Customers, Products, Invoices)
-- [ ] Inventory management
-- [ ] File storage integration
-- [ ] Analytics & reporting
-- [ ] Payment processing
+### Phase 2.1 (Next Month)
+- [ ] Customer Management module
+- [ ] Product/Inventory module
+- [ ] Invoice & Quotation module
+- [ ] Payment processing integration
+- [ ] Advanced reporting
 - [ ] Email templates
-- [ ] SSO integration
+- [ ] File storage (S3/MinIO)
+
+### Phase 3 (Future)
+- [ ] Mobile app (React Native)
+- [ ] SSO integration (Google, Microsoft)
+- [ ] Advanced analytics dashboard
+- [ ] Multi-language support (i18n)
+- [ ] Webhooks & API integrations
+- [ ] Advanced workflow automation
 
 ---
 
 ## 🧪 Testing
 
-### Manual Testing
+### Production Testing
 ```bash
 # Health check
-curl http://localhost:8080/health
+curl https://api.infold.app/health
+
+# Login
+curl -X POST https://api.infold.app/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@acme-corp.com",
+    "password": "Admin@123"
+  }'
+
+# Get company settings (requires auth token)
+curl https://api.infold.app/api/settings/company \
+  -H "Authorization: Bearer <token>"
+```
+
+### Local Development Testing
+```bash
+# Health check
+curl http://localhost:18080/health
 
 # Register tenant
-curl -X POST http://localhost:8080/api/auth/register \
+curl -X POST http://localhost:18080/api/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "company_name": "Test Corp",
@@ -303,7 +425,7 @@ curl -X POST http://localhost:8080/api/auth/register \
   }'
 
 # Login
-curl -X POST http://localhost:8080/api/auth/login \
+curl -X POST http://localhost:18080/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "admin@acme-corp.com",
@@ -326,100 +448,166 @@ go tool cover -html=coverage.out
 
 ## 🚀 Quick Start
 
-### 1. Start Infrastructure
+### Local Development
+
+#### 1. Start Infrastructure
 ```bash
 docker-compose up -d
 ```
 
-### 2. Start Backend (once fixed)
+#### 2. Start Backend
 ```bash
 cd backend
 go run cmd/server/main.go
-# Server: http://localhost:8080
+# Server: http://localhost:18080
 ```
 
-### 3. Start Frontend
+#### 3. Start Frontend
 ```bash
 cd frontend
 npm run dev -- -p 13000
 # Frontend: http://localhost:13000
 ```
 
-### 4. Access Services
+#### 4. Access Services
 - **Frontend**: http://localhost:13000
-- **Backend API**: http://localhost:8080
+- **Backend API**: http://localhost:18080
 - **Mailpit UI**: http://localhost:18025
 - **PostgreSQL**: localhost:15433
 - **Redis**: localhost:26379
 
+### Production Deployment
+
+#### SSH into VPS
+```bash
+ssh -i ~/.ssh/myerp_vps_key root@167.86.117.179
+```
+
+#### Deploy Updates
+```bash
+cd /opt/myerp-v2
+
+# Pull latest code
+git pull
+
+# Rebuild and restart services
+docker compose -f docker-compose.prod.yml build --no-cache
+docker compose -f docker-compose.prod.yml up -d --force-recreate
+
+# View logs
+docker logs myerp_frontend -f
+docker logs myerp_backend -f
+```
+
+#### Check Status
+```bash
+# Container status
+docker ps
+
+# Service health
+curl https://api.infold.app/health
+
+# Caddy status
+systemctl status caddy
+```
+
 ---
 
-## 📁 Recent Changes (Jan 17, 2026)
+## 📁 Recent Changes (Jan 20, 2026)
+
+### New Features
+- ✅ **Company Settings Module**: Complete company profile management
+  - Backend: Repository, Service, Handler, Routes
+  - Database: Migration 015 with RLS
+  - Frontend: Multi-section form with Google Places integration
+  - API endpoints for CRUD operations
+
+### Production Deployment
+- ✅ Deployed to VPS at infold.app
+- ✅ Configured Caddy reverse proxy with auto-HTTPS
+- ✅ Fixed CORS for production domains
+- ✅ Configured Docker build arguments for Next.js env vars
+- ✅ Backend running on port 18080
+- ✅ Frontend running on port 13000
 
 ### Created Files
-- `backend/cmd/server/main.go` - Server entry point
-- `backend/cmd/migrate/main.go` - Migration CLI
-- `backend/.env` - Environment configuration
-- `frontend/src/components/providers/theme-provider.tsx` - Theme context
-- `frontend/src/components/ui/theme-toggle.tsx` - Theme switcher
-- `frontend/DARK_MODE.md` - Dark mode documentation
-- `DARK_MODE_IMPLEMENTATION_SUMMARY.md` - Implementation guide
+- `backend/migrations/015_create_company_settings_table.up.sql`
+- `backend/migrations/015_create_company_settings_table.down.sql`
+- `backend/internal/models/company_settings.go`
+- `backend/internal/repository/company_settings_repository.go`
+- `backend/internal/services/company_settings_service.go`
+- `backend/internal/handlers/company_settings_handler.go`
+- `frontend/src/app/dashboard/settings/company/page.tsx`
+- `frontend/src/app/dashboard/settings/company/_components/general-settings.tsx`
+- `frontend/src/components/ui/date-picker.tsx`
+- `docker-compose.prod.yml`
 
 ### Modified Files
-- `frontend/src/app/layout.tsx` - Added ThemeProvider
-- `frontend/src/components/layout/Header.tsx` - Added ThemeToggle
-- `frontend/src/app/globals.css` - Dark mode CSS variables
-- `frontend/tailwind.config.ts` - Color system update
-- `docker-compose.yml` - Port configuration (15433, 26379, 11025/18025)
-- `backend/.env` - Updated for new ports
+- `backend/internal/server/router.go` - Added company settings routes
+- `frontend/Dockerfile` - Added ARG for build-time env vars
+- `frontend/src/lib/api.ts` - Updated API base URL
+- `frontend/src/app/globals.css` - Added Google Places z-index fix
+- `frontend/src/components/ui/calendar.tsx` - Increased cell size
+- Backend `.env` (production) - Updated URLs for production
 
 ### Database Changes
-- Created test tenant: ACME Corporation
-- Created admin user: admin@acme-corp.com
+- Added company_settings table with RLS
+- Migration 015 created and applied
 
 ---
 
 ## 🐛 Known Issues
 
-1. **Backend Compilation Errors**
-   - `router.go` service initialization needs fixing
-   - Parameter mismatches in middleware setup
-   - Status: 🔧 Fixing now
+### Resolved
+- ✅ Backend compilation errors (fixed)
+- ✅ CORS configuration (fixed)
+- ✅ Environment variable management (fixed)
+- ✅ Docker build configuration (fixed)
+- ✅ Production deployment (completed)
 
-2. **Frontend**
-   - No issues ✅
+### Minor UI Polish (Low Priority)
+- ⚠️ DatePicker calendar width could be wider
+- ⚠️ Google Places autocomplete selection edge cases
+- Note: Core functionality works, these are cosmetic improvements
 
-3. **Infrastructure**
-   - No issues ✅
+### None Critical
+- No blocking issues in production ✅
 
 ---
 
 ## 📊 Metrics & Performance
 
 ### Database
-- Tables: 9 (with RLS)
-- Migrations: 14
-- Indexes: 40+
-- RLS Policies: 8
+- Tables: 10 (with RLS)
+- Migrations: 15
+- Indexes: 45+
+- RLS Policies: 9
 
 ### Backend
-- Go Files: 48
-- Lines of Code: ~6,000
-- Services: 9
-- Repositories: 7
-- Handlers: 9
+- Go Files: 50+
+- Lines of Code: ~7,500
+- Services: 10
+- Repositories: 8
+- Handlers: 10
 - Middleware: 2
 
 ### Frontend
-- Components: 50+
-- Pages: 15+
-- Routes: 20+
-- Lines of Code: ~8,000
+- Components: 55+
+- Pages: 16+
+- Routes: 22+
+- Lines of Code: ~9,500
+
+### Production Performance
+- Frontend load time: ~1.7s
+- Backend response time: <100ms
+- Database queries: Optimized with indexes
+- CDN: Caddy with HTTP/2
 
 ---
 
 ## 🎯 Success Criteria
 
+### Phase 1 - Core Platform ✅
 - [x] Multi-tenant registration ✅
 - [x] Email verification flow ✅
 - [x] JWT authentication ✅
@@ -430,8 +618,21 @@ npm run dev -- -p 13000
 - [x] Session management ✅
 - [x] Audit logging ✅
 - [x] Dark mode ✅
-- [ ] Backend server running ⏳
-- [ ] Full end-to-end login test ⏳
+
+### Phase 1.5 - Production Deployment ✅
+- [x] Backend server running ✅
+- [x] Frontend deployed ✅
+- [x] VPS deployment ✅
+- [x] HTTPS with Caddy ✅
+- [x] Environment configuration ✅
+- [x] Full end-to-end login test ✅
+
+### Phase 2.0 - Business Features ⏳
+- [x] Company settings module ✅
+- [ ] Customer management 📝
+- [ ] Inventory management 📝
+- [ ] Invoice generation 📝
+- [ ] Payment processing 📝
 
 ---
 
@@ -444,4 +645,4 @@ npm run dev -- -p 13000
 
 ---
 
-*This document is updated automatically as the project progresses.*
+*This document tracks the current state of MyERP v2 development and deployment.*

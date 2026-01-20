@@ -23,6 +23,7 @@ import { Combobox } from "@/components/ui/combobox";
 import { DatePicker } from "@/components/ui/date-picker";
 import { INDUSTRIES } from "@/lib/industries";
 import { COUNTRY_CODES } from "@/lib/country-codes";
+import { companySettingsApi } from "@/lib/api/company-settings";
 import Image from "next/image";
 import { format } from "date-fns";
 
@@ -178,35 +179,8 @@ export function GeneralSettings() {
 
           const autocomplete = new (window as any).google.maps.places.Autocomplete(autocompleteInputRef.current, options);
 
-          // Handle pac-container interaction properly
-          const handlePacContainerSetup = () => {
-            // Wait a bit for pac-container to be created
-            setTimeout(() => {
-              const pacContainers = document.querySelectorAll('.pac-container');
-              if (pacContainers.length > 0) {
-                const pacContainer = pacContainers[pacContainers.length - 1] as HTMLElement;
-
-                // Prevent blur on mousedown but allow the click to go through
-                pacContainer.addEventListener('mousedown', (e) => {
-                  // Don't prevent default - let Google handle it
-                  // Just keep the input focused
-                  if (autocompleteInputRef.current) {
-                    setTimeout(() => {
-                      autocompleteInputRef.current?.focus();
-                    }, 0);
-                  }
-                });
-
-                console.log('Attached event handlers to pac-container');
-              }
-            }, 150);
-          };
-
-          // Listen for input events to know when dropdown appears
-          autocompleteInputRef.current.addEventListener('input', handlePacContainerSetup);
-
-          // Also setup on initialization
-          handlePacContainerSetup();
+          // Note: z-index for pac-container is handled in globals.css
+          // No additional JavaScript configuration needed for modal compatibility
 
           autocomplete.addListener("place_changed", () => {
             console.log("Place changed event fired");
@@ -276,13 +250,9 @@ export function GeneralSettings() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/settings/company", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await companySettingsApi.getSettings();
+      const data = response.data;
 
-      const data = await response.json();
       if (data.success) {
         if (data.data) {
           setSettings(data.data);
@@ -320,17 +290,9 @@ export function GeneralSettings() {
   const updateSettings = async (updates: Partial<CompanySettings>) => {
     setSaving(true);
     try {
-      const response = await fetch("http://localhost:8080/api/settings/company", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await companySettingsApi.updateSettings(updates);
+      const data = response.data;
 
-          Authorization: `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify(updates),
-      });
-
-      const data = await response.json();
       if (data.success) {
         toast.success("Settings updated successfully");
         setSettings(data.data);
