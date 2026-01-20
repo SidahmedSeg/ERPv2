@@ -293,7 +293,7 @@ export function GeneralSettings() {
       const response = await companySettingsApi.updateSettings(updates);
       const data = response.data;
 
-      if (data.success) {
+      if (data.success && data.data) {
         toast.success("Settings updated successfully");
         setSettings(data.data);
         return true;
