@@ -116,7 +116,7 @@ export const authApi = {
     }),
 
   verifyEmail: (token: string) =>
-    api.get<ApiResponse>(`/auth/verify-email?token=${token}`),
+    api.post<ApiResponse>('/auth/verify-email', { token }),
 
   logout: () => api.post<ApiResponse>('/auth/logout'),
 
