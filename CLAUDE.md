@@ -626,6 +626,105 @@ ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBC8DmzuIo3Zz9a2pkGCp4OG0vgR6NlOesy7ETGKNWTu
 
 **SSH Private Key Location:** `~/.ssh/myerp_vps_key` (permissions: 600) - stored locally only
 
+### CORS & API Configuration
+
+**CRITICAL:** Frontend and backend must be configured with correct URLs for production.
+
+#### Backend CORS Configuration
+Location: `/opt/myerp-v2/backend/.env`
+```env
+# CORS - Must include all frontend domains
+CORS_ALLOWED_ORIGINS=https://app.infold.app,http://localhost:13000,http://localhost:18080
+
+# Application URLs
+APP_BASE_URL=https://api.infold.app
+FRONTEND_URL=https://app.infold.app
+BASE_DOMAIN=infold.app
+```
+
+**Why this matters:**
+- Backend must explicitly allow the frontend domain in CORS_ALLOWED_ORIGINS
+- Without proper CORS config, browser blocks all API requests from frontend
+- Always use HTTPS in production (http://localhost only for local development)
+
+#### Frontend API URL Configuration
+The frontend must be **built** with the correct API URL (not just set at runtime).
+
+**For Production:**
+```bash
+# Build frontend with production API URL
+docker build \
+  --build-arg NEXT_PUBLIC_API_URL=https://api.infold.app \
+  --build-arg NEXT_PUBLIC_BASE_DOMAIN=infold.app \
+  --build-arg NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your_key \
+  -t myerp-v2-frontend:latest \
+  -f Dockerfile \
+  .
+```
+
+**For Local Development:**
+```env
+# frontend/.env.local
+NEXT_PUBLIC_API_URL=http://localhost:18080
+NEXT_PUBLIC_BASE_DOMAIN=myerp.local
+NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your_key_here
+```
+
+**IMPORTANT:** Next.js bakes `NEXT_PUBLIC_*` variables into the build at build time. You MUST rebuild the frontend image whenever changing these values.
+
+#### Common CORS Errors & Fixes
+
+**Error: "No 'Access-Control-Allow-Origin' header present"**
+- **Cause:** Frontend calling wrong API URL (e.g., localhost instead of api.infold.app)
+- **Fix:** Rebuild frontend with correct `NEXT_PUBLIC_API_URL`
+
+**Error: "Access-Control-Allow-Origin does not match"**
+- **Cause:** Frontend domain not in backend's CORS_ALLOWED_ORIGINS
+- **Fix:** Add frontend domain to backend .env, restart backend container
+
+**How to verify configuration:**
+```bash
+# Check frontend API URL in built files
+docker exec myerp_frontend sh -c 'grep -r "api.infold.app" .next/cache/ | head -1'
+
+# Check backend CORS config
+docker exec myerp_backend printenv | grep CORS
+
+# Test CORS preflight
+curl -X OPTIONS https://api.infold.app/api/auth/login \
+  -H "Origin: https://app.infold.app" \
+  -H "Access-Control-Request-Method: POST" \
+  -v
+```
+
+#### Rebuilding Frontend After Configuration Change
+```bash
+# 1. SSH to VPS
+ssh -i ~/.ssh/myerp_vps_key root@167.86.117.179
+
+# 2. Rebuild with correct production URLs
+cd /opt/myerp-v2/frontend
+docker build \
+  --build-arg NEXT_PUBLIC_API_URL=https://api.infold.app \
+  --build-arg NEXT_PUBLIC_BASE_DOMAIN=infold.app \
+  --build-arg NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=AIzaSyAxOFMLNk2NuAf0fojr6oRnM-MD6oM8zpA \
+  -t myerp-v2-frontend:latest \
+  -f Dockerfile \
+  .
+
+# 3. Restart container
+docker stop myerp_frontend && docker rm myerp_frontend
+docker run -d \
+  --name myerp_frontend \
+  --network myerp-v2_myerp-network \
+  -p 13000:3000 \
+  --restart unless-stopped \
+  myerp-v2-frontend:latest
+
+# 4. Verify
+curl -I https://app.infold.app/auth/login
+```
+
 ### Quick Access Commands
 ```bash
 # SSH into VPS (using the private key)
@@ -652,7 +751,8 @@ ssh -i ~/.ssh/myerp_vps_key root@167.86.117.179 "journalctl -u caddy -n 50 -f"
 
 ---
 
-**Last Updated:** January 18, 2026
+**Last Updated:** January 21, 2026
 **Version:** 2.0.0
 **Backend Status:** Phase 1 Complete ✅
 **Frontend Status:** Phase 1.5 In Progress (60% - Dark Mode ✅)
+**Production Status:** Deployed & Running ✅ (CORS Fixed)
