@@ -725,6 +725,57 @@ docker run -d \
 curl -I https://app.infold.app/auth/login
 ```
 
+### Email / SMTP Configuration
+
+**CRITICAL:** Mailpit SMTP port differs between local and Docker deployment.
+
+#### Local Development (running backend outside Docker)
+```env
+# backend/.env
+SMTP_HOST=localhost
+SMTP_PORT=11025  # External mapped port
+SMTP_USER=
+SMTP_PASSWORD=
+EMAIL_FROM=noreply@myerp.local
+```
+
+**Why 11025?** When backend runs on host machine, it connects to the **exposed port** 11025.
+
+#### Production / Docker (backend inside Docker network)
+```env
+# /opt/myerp-v2/backend/.env on VPS
+SMTP_HOST=myerp-v2-mailpit
+SMTP_PORT=1025  # Internal container port
+SMTP_USER=
+SMTP_PASSWORD=
+EMAIL_FROM=noreply@myerp.local
+```
+
+**Why 1025?** When backend runs inside Docker network, it connects to the **internal port** 1025.
+
+#### Port Mapping Explanation
+```
+Mailpit Container:
+  Internal Port: 1025 (SMTP), 8025 (Web UI)
+  External Ports: 11025 (SMTP), 18025 (Web UI)
+
+Local Backend → localhost:11025 → Docker Port Mapping → Container:1025
+Docker Backend → myerp-v2-mailpit:1025 → Direct Internal Connection
+```
+
+#### Verify Email is Working
+```bash
+# Check Mailpit UI
+# Local: http://localhost:18025
+# VPS: http://167.86.117.179:18025
+
+# Check backend logs after registration
+docker logs myerp_backend --tail 20 | grep -i email
+
+# Should see: "Verification email sent successfully"
+# Should NOT see: "Failed to send verification email"
+```
+
 ### Quick Access Commands
 ```bash
 # SSH into VPS (using the private key)
