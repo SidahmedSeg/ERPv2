@@ -652,9 +652,9 @@ The frontend must be **built** with the correct API URL (not just set at runtime
 
 **For Production:**
 ```bash
-# Build frontend with production API URL
+# Build frontend with production API URL (MUST include /api suffix)
 docker build \
-  --build-arg NEXT_PUBLIC_API_URL=https://api.infold.app \
+  --build-arg NEXT_PUBLIC_API_URL=https://api.infold.app/api \
   --build-arg NEXT_PUBLIC_BASE_DOMAIN=infold.app \
   --build-arg NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your_key \
   -t myerp-v2-frontend:latest \
@@ -664,8 +664,8 @@ docker build \
 
 **For Local Development:**
 ```env
-# frontend/.env.local
-NEXT_PUBLIC_API_URL=http://localhost:18080
+# frontend/.env.local (MUST include /api suffix)
+NEXT_PUBLIC_API_URL=http://localhost:18080/api
 NEXT_PUBLIC_BASE_DOMAIN=myerp.local
 NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your_key_here
 ```
@@ -702,10 +702,10 @@ curl -X OPTIONS https://api.infold.app/api/auth/login \
 # 1. SSH to VPS
 ssh -i ~/.ssh/myerp_vps_key root@167.86.117.179
 
-# 2. Rebuild with correct production URLs
+# 2. Rebuild with correct production URLs (MUST include /api suffix)
 cd /opt/myerp-v2/frontend
 docker build \
-  --build-arg NEXT_PUBLIC_API_URL=https://api.infold.app \
+  --build-arg NEXT_PUBLIC_API_URL=https://api.infold.app/api \
   --build-arg NEXT_PUBLIC_BASE_DOMAIN=infold.app \
   --build-arg NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=AIzaSyAxOFMLNk2NuAf0fojr6oRnM-MD6oM8zpA \
   -t myerp-v2-frontend:latest \
