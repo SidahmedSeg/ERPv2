@@ -56,6 +56,7 @@ interface TaxRate {
 
 export function TaxSettings() {
   const { accessToken } = useAuthStore();
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:18080/api';
   const [taxTypes, setTaxTypes] = useState<TaxType[]>([]);
   const [taxRates, setTaxRates] = useState<TaxRate[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,7 +84,7 @@ export function TaxSettings() {
 
   const fetchTaxTypes = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/settings/tax-types", {
+      const response = await fetch("`${apiUrl}/settings/tax-types`", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const data = await response.json();
@@ -99,7 +100,7 @@ export function TaxSettings() {
 
   const fetchTaxRates = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/settings/tax-rates", {
+      const response = await fetch("`${apiUrl}/settings/tax-rates`", {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       const data = await response.json();
@@ -114,7 +115,7 @@ export function TaxSettings() {
   // Tax Type operations
   const handleCreateType = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/settings/tax-types", {
+      const response = await fetch("`${apiUrl}/settings/tax-types`", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -141,7 +142,7 @@ export function TaxSettings() {
     if (!confirm("Are you sure you want to delete this tax type?")) return;
 
     try {
-      const response = await fetch(`http://localhost:8080/api/settings/tax-types/${id}`, {
+      const response = await fetch(``${apiUrl}/settings/tax-types`/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -159,7 +160,7 @@ export function TaxSettings() {
   // Tax Rate operations
   const handleCreateRate = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/settings/tax-rates", {
+      const response = await fetch("`${apiUrl}/settings/tax-rates`", {
         method: editingRate ? "PUT" : "POST",
         headers: {
           "Content-Type": "application/json",
@@ -205,7 +206,7 @@ export function TaxSettings() {
     if (!confirm("Are you sure you want to delete this tax rate?")) return;
 
     try {
-      const response = await fetch(`http://localhost:8080/api/settings/tax-rates/${id}`, {
+      const response = await fetch(``${apiUrl}/settings/tax-rates`/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -222,7 +223,7 @@ export function TaxSettings() {
 
   const handleSetDefault = async (id: string) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/settings/tax-rates/${id}/default`, {
+      const response = await fetch(``${apiUrl}/settings/tax-rates`/${id}/default`, {
         method: "PATCH",
         headers: { Authorization: `Bearer ${accessToken}` },
       });
