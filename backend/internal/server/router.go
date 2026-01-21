@@ -63,6 +63,7 @@ func (s *Router) Setup() *chi.Mux {
 	permissionRepo := repository.NewPermissionRepository(s.db)
 	userRoleRepo := repository.NewUserRoleRepository(s.db)
 	companySettingsRepo := repository.NewCompanySettingsRepository(s.db)
+	departmentRepo := repository.NewDepartmentRepository(s.db)
 
 	// Initialize services
 	jwtService := services.NewJWTService(&s.config.JWT)
@@ -91,6 +92,7 @@ func (s *Router) Setup() *chi.Mux {
 	auditHandler := handlers.NewAuditHandler(auditService)
 	securityHandler := handlers.NewSecurityHandler(auditService, sessionService, twoFactorService)
 	companySettingsHandler := handlers.NewCompanySettingsHandler(companySettingsService)
+	departmentHandler := handlers.NewDepartmentHandler(departmentRepo, userRepo)
 
 	// Health check endpoint
 	s.router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
@@ -124,6 +126,9 @@ func (s *Router) Setup() *chi.Mux {
 
 		// Company Settings
 		companySettingsHandler.RegisterRoutes(r, authMiddleware)
+
+		// Departments
+		departmentHandler.RegisterRoutes(r, authMiddleware, permMiddleware)
 	})
 
 	return s.router

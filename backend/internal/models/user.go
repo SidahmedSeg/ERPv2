@@ -24,6 +24,9 @@ type User struct {
 	Phone     *string `json:"phone,omitempty" db:"phone"`
 	AvatarURL *string `json:"avatar_url,omitempty" db:"avatar_url"`
 
+	// Organization
+	DepartmentID *uuid.UUID `json:"department_id,omitempty" db:"department_id"`
+
 	// Status: active | suspended | deactivated | pending
 	Status string `json:"status" db:"status"`
 
