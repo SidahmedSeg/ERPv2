@@ -98,9 +98,8 @@ func (s *Router) Setup() *chi.Mux {
 		w.Write([]byte("OK"))
 	})
 
-	// API routes
-	s.router.Route("/api", func(r chi.Router) {
-		// Apply tenant resolution middleware to all API routes
+	// Apply tenant resolution middleware to all routes (except /health)
+	s.router.Group(func(r chi.Router) {
 		r.Use(tenantMiddleware.ResolveTenant)
 
 		// Public routes (no authentication required)
