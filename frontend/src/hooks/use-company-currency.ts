@@ -14,7 +14,8 @@ export function useCompanyCurrency() {
       }
 
       try {
-        const response = await fetch('http://localhost:8080/api/settings/company', {
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:18080/api';
+        const response = await fetch(`${apiUrl}/settings/company`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
